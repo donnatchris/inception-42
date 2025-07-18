@@ -16,20 +16,20 @@
 # escape=\
 
 FROM debian:11.11
+LABEL version=v1.0
+LABEL author=chdonnat
 RUN apt-get update \
-	&& apt-get install -y nginx curl openssl procps \
+	&& apt-get install -y nginx vim curl openssl procps \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \
-	&& mkdir -p /etc/ssl/certs \
-	&& mkdir -p /etc/ssl/private \
-	&& openssl req -x509 -nodes -days 365 \
-	-out /etc/ssl/certs/nginx.crt \
-	-keyout /etc/ssl/private/nginx.key \
-	-subj "/C=FR/ST=Occitanie/L=Perpignan/O=42/OU=42/CN=chdonnat.42.fr/UID=chdonnat" \
+	&& mkdir -p /etc/nginx/ssl \
+	&& openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=FR/ST=Occitanie/L=Perpignan/O=42/CN=chdonnat.42.fr" \
 	&& mkdir -p /var/run/nginx \
-	&& mkdir -p /var/www/wordpress \
 	&& mkdir -p /var/www/html
+
 COPY conf/nginx.conf /etc/nginx/nginx.conf
-COPY conf/index.html /var/www/html/index.html
+COPY conf/index.html /var/www/wordpress/index.html
+
 EXPOSE 443
+
 CMD ["nginx", "-g", "daemon off;"]
