@@ -33,7 +33,7 @@ services:
     container_name: wordpress
     env_file: .env
     volumes:
-      - wordpress:/var/www/wordpress
+      - wordpress:/var/www/html
     networks:
       - inception
     build:
@@ -41,7 +41,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - mariadb
-    restart: "on-failure"
+    restart: unless-stopped
     expose:
       - "9000"
 

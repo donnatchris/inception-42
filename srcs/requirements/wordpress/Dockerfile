@@ -1,37 +1,44 @@
-# instructions en majuscule
-# FROM : image de depart
-# WORKDIR : repertoire de travail dans le cadre du build (plusieurs possibles)
-# ARG : definir des variables de build (clef=valeur)
-# ENV : variables d environnement pour le build et lancement (clef=valeur)
-# USER : utilisateur pour les cmdes suivantes et user qui lance le processus
-# ADD : ajoute fichiers ou repertoires - peut etre une url, un repo git... (ADD source destination)
-# COPY : idem que ADD mais ne peut pas utiliser des fichiers distants
-# RUN : lance des commandes shell, utile aussi pour les layers (apt, etc)
-# CMD : commande lancee dans le conteneur sous forme de liste (ex : CMD ["python3","-m","flask","run"])
-# ENTRYPOINT : plus ou moins comme CMD
-# LABEL : ajout de metadatas (cle=valeur)
-#docker  EXPOSE : ports en ecoute par le processus, plusieurs lignes possibles (ex : EXPOSE 80/tcp)
-# VOLUME : declare les volumes de maniere separee, sous forme de liste (ex : VOLUME ["/var/www","/var/log/apache2"])
-
-# escape=\
-
 FROM debian:11.11
-LABEL version=v1.0
-LABEL author=chdonnat
-RUN apt-get update \
-	&& apt-get upgrade -y \
-	&& mkdir -p /run/php \
-	&& apt-get install -y wget php7.4 php-fpm php-mysql mariadb-client \
-	&& wget https://fr.wordpress.org/wordpress-6.8.1-fr_FR.tar.gz -P /var/www \
-	&& cd /var/www && tar -xzf wordpress-6.8.1-fr_FR.tar.gz \
-	&& rm wordpress-6.8.1-fr_FR.tar.gz \
-	&& wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
-	&& chmod +x wp-cli.phar \
-	&& mv wp-cli.phar /usr/local/bin/wp \
-	&& chown -R root:root /var/www/wordpress \
-	&& apt-get clean \
-	&& rm -rf /var/lib/apt/lists/*
+
+RUN apt update -y && \
+	apt upgrade -y && \
+	apt install -y \
+	wget \
+	curl \
+	php7.4 \
+	php7.4-fpm \
+	php7.4-mysql \
+	mariadb-client \
+	unzip \
+	less \
+	redis \
+	php-redis \
+	netcat && \
+	rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /run/php
+
 COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
-COPY conf/wp-config.php /var/www/html/wp-config.php
-RUN chown -R www-data:www-data /var/www/html
-CMD ["php-fpm7.4", "-F"]
+
+RUN wget https://fr.wordpress.org/wordpress-6.8.2-fr_FR.tar.gz -P /var/www && \
+	tar -xzf /var/www/wordpress-6.8.2-fr_FR.tar.gz -C /var/www && \
+	rm /var/www/wordpress-6.8.2-fr_FR.tar.gz && \
+	chown -R www-data:www-data /var/www/wordpress
+
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    chmod +x wp-cli.phar && \
+    mv wp-cli.phar /usr/local/bin/wp
+
+EXPOSE 9000
+
+COPY tools/install.sh /install.sh
+RUN chmod +x /install.sh
+RUN chmod 777 /var/www/wordpress
+
+
+WORKDIR /var/www/wordpress
+
+HEALTHCHECK --interval=3s --timeout=3s --retries=3 \
+CMD mysqladmin -h"mariadb" -u"$MDB_USER" -p"$MDB_USER_PASS" ping &>/dev/null;
+
+ENTRYPOINT [ "/install.sh" ]
