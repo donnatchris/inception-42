@@ -1,62 +1,54 @@
 services:
   mariadb:
+    build: requirements/mariadb
     container_name: mariadb
-    networks:
-      - inception
-    build:
-      context: requirements/mariadb
-      dockerfile: Dockerfile
     env_file: .env
     volumes:
       - mariadb:/var/lib/mysql
-    restart: unless-stopped
     expose:
       - "3306"
+    networks:
+      - inception
+
+  wordpress:
+    build: requirements/wordpress
+    container_name: wordpress
+    env_file: .env
+    depends_on:
+      - mariadb
+    volumes:
+      - wordpress:/var/www/wordpress
+    expose:
+      - "9000"
+    networks:
+      - inception
 
   nginx:
+    build: requirements/nginx
     container_name: nginx
+    env_file: .env
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
     volumes:
       - wordpress:/var/www/wordpress
     networks:
       - inception
-    depends_on:
-      - wordpress
-    build:
-      context: requirements/nginx
-      dockerfile: Dockerfile
-    env_file: .env
-    ports:
-      - "443:443"
-    restart: "on-failure"
-
-  wordpress:
-    container_name: wordpress
-    env_file: .env
-    volumes:
-      - wordpress:/var/www/html
-    networks:
-      - inception
-    build:
-      context: requirements/wordpress
-      dockerfile: Dockerfile
-    depends_on:
-      - mariadb
-    restart: unless-stopped
-    expose:
-      - "9000"
 
 volumes:
-  wordpress:
-    driver: local
-    driver_opts:
-      type: none
-      device: ~/data/wordpress
-      o: bind
   mariadb:
     driver: local
     driver_opts:
       type: none
       device: ~/data/mariadb
+      o: bind
+
+  wordpress:
+    driver: local
+    driver_opts:
+      type: none
+      device: ~/data/wordpress
       o: bind
 
 networks:
