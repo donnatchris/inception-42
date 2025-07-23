@@ -2441,4 +2441,28 @@ secrets/     # Répertoire contenant les mots de passe ou informations critiques
 > Important : même si nous copions manuellement certains fichiers via `COPY` dans notre `Dockerfile`, ils **doivent quand même être accessibles dans le contexte**.
 > Un fichier ignoré dans `.dockerignore` **ne pourra pas être copié**, sauf s’il est explicitement **hors du dossier ignoré**.
 
+### SECURISER LES MOTS DE PASSE
+
+Pour des raisons de sécurité, les mots de passe ne doivent pas être stockés en clair dans le fichier `.env`, mais dans des fichiers placés dans le dossier `secrets/`.
+Le fichier `.env` contiendra alors les chemins vers ces fichiers.
+Le dossier `secrets/` sera exclu du dépôt (`.gitignore`) et de la build Docker (`.dockerignore`), et ses contenus sont injectés au runtime depuis les scripts.
+
+#### Fichiers dédiés
+
+Pour chaque mot de passe, nous allons créer un fichier `.txt` placé dans le répertoire `secrets`.
+Par exemple, le mot de pass root de MariaDB sera stocké dans un fichier `MDB_ROOT_PASS_FILE.txt`.
+
+Notre dossier `secrets` contiendra donc les fichiers suivants :
+
+- `MDB_ROOT_PASS_FILE.txt`
+- `MDB_USER_PASS_FILE.txt`
+- `WP_ADMIN_PASS_FILE.txt`
+- `WP_USER_PASS_FILE.txt`
+
+Chaque fichier comportera uniquement le mot de passe concerné.
+
+#### Modification du `.env.
+
+Dans notre fichier `.env` les valeurs associées aux variables de mots de passe deviennent donc les chemins vers ces fichiers :
+
 
