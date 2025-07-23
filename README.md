@@ -2327,17 +2327,17 @@ setup_hosts:
 # Run docker compose up using the config in srcs/
 up:
 	@echo "🐳 Starting docker compose using $(COMPOSE_PATH)..."
-	docker compose --env-file $(ENV_FILE) -f $(COMPOSE_PATH) up -d
+	@docker compose --env-file $(ENV_FILE) -f $(COMPOSE_PATH) up -d
 
 # Stop containers and without removing images or deleting volumes
 down:
 	@echo "🛑 Stopping containers without removing images (data preserved)..."
-	docker compose -f srcs/docker-compose.yml down
+	@docker compose -f srcs/docker-compose.yml down
 
 # Stop containers and remove images without deleting volumes
 clean:
 	@echo "🛑 Stopping containers and removing images (data preserved)..."
-	docker compose -f srcs/docker-compose.yml down --rmi all
+	@docker compose -f srcs/docker-compose.yml down --rmi all
 
 # Full reset: stop, remove containers & volumes, delete local data
 reset:
@@ -2348,7 +2348,67 @@ reset:
 		exit 1; \
 	fi
 	@echo "Proceeding with full reset..."
-	docker compose -f srcs/docker-compose.yml down -v --rmi all
+	@docker compose -f srcs/docker-compose.yml down -v --rmi all
 	@echo "Deleting local data directories..."
 	sudo rm -rf $$HOME/data/wordpress $$HOME/data/mariadb
+
+re: clean all
 ```
+
+### NOMMER CORRECTEMENT LES IMAGES
+
+Le sujet impose que chaque image construite ait un nom explicite, correspondant au service (par exemple `mariadb` pour le service MariaDB).
+Or, si on ne précise rien dans le fichier `docker-compose.yml`, Docker nomme les images automatiquement avec des préfixes et suffixes (par exemple `srcs-mariadb`), ce qui ne respecte pas cette contrainte.
+
+Nous allons donc modifier notre `docker-compose.yml` pour spécifier un nom d’image explicite.
+
+#### Utilisation de la clé `image`
+
+Jusqu’à présent, dans notre `docker-compose.yml`, nous écrivions simplement :
+
+```yaml
+services:
+  mariadb:
+    build: requirements/mariadb
+```
+
+Cela fonctionne, mais ne permet pas de contrôler le nom de l’image construite.
+Pour y remédier, nous allons :
+
+1. Remplacer la valeur directe de `build` par un bloc `build:` avec la clé `context`, pointant sur le répertoire de build.
+2. Ajouter la clé `image:` (en dehors du bloc `build`) pour définir explicitement le nom de l’image.
+
+Exemple :
+
+```yaml
+services:
+  mariadb:
+    build:
+      context: requirements/mariadb
+    image: mariadb
+```
+
+#### Problème avec les noms d’image "officiels"
+
+Si nous utilisons un nom d’image générique comme `mariadb`, `nginx`, ou `wordpress`, Docker va **chercher une image existante sur Docker Hub**, ce qui est interdit par le sujet.
+
+Même si nous avons bien un `Dockerfile` dans `requirements/mariadb`, Docker ignorera la construction et tentera de récupérer l’image officielle.
+
+#### Solution : ajouter un *tag*
+
+Pour éviter cela, il suffit **d’ajouter un tag** au nom de l’image.
+Un tag est un suffixe après un deux-points `:` qui identifie une version personnalisée.
+Cela empêche Docker de confondre votre image avec une image officielle.
+
+Par exemple :
+
+```yaml
+services:
+  mariadb:
+    build:
+      context: requirements/mariadb
+    image: mariadb:inception42
+```
+
+Dès lors, Docker ne trouvera pas d’image `mariadb:inception42` sur Docker Hub, et construira bien la notre à partir du `Dockerfile`.
+
