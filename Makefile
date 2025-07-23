@@ -39,16 +39,16 @@ check_vars: check_env
 		fi; \
 	done
 
-# Create ~/data/wordpress and ~/data/mariadb if they don't exist
+# Create ~/chdonnat/data/wordpress and ~/chdonnat/data/mariadb if they don't exist
 setup_dirs:
-	@echo "Checking ~/data/wordpress and ~/data/mariadb directories..."
-	@if [ ! -d "$$HOME/data/wordpress" ]; then \
-		echo "Creating $$HOME/data/wordpress directory"; \
-		mkdir -p "$$HOME/data/wordpress"; \
+	@echo "Checking ~/chdonnat/data/wordpress and ~/chdonnat/data/mariadb directories..."
+	@if [ ! -d "$$HOME/chdonnat/data/wordpress" ]; then \
+		echo "Creating $$HOME/chdonnat/data/wordpress directory"; \
+		mkdir -p "$$HOME/chdonnat/data/wordpress"; \
 	fi
-	@if [ ! -d "$$HOME/data/mariadb" ]; then \
-		echo "Creating $$HOME/data/mariadb directory"; \
-		mkdir -p "$$HOME/data/mariadb"; \
+	@if [ ! -d "$$HOME/chdonnat/data/mariadb" ]; then \
+		echo "Creating $$HOME/chdonnat/data/mariadb directory"; \
+		mkdir -p "$$HOME/chdonnat/data/mariadb"; \
 	fi
 
 # Add 127.0.0.1 DOMAIN_NAME to /etc/hosts if missing
@@ -79,7 +79,7 @@ clean:
 
 # Full reset: stop, remove containers & volumes, delete local data
 reset:
-	@echo "⚠️  WARNING: This will stop containers, remove volumes, and delete local data in ~/data"
+	@echo "⚠️  WARNING: This will stop containers, remove volumes, and delete local data in ~/chdonnat/data"
 	@read -p "Are you sure you want to continue? [y/N] " confirm; \
 	if [ "$$confirm" != "y" ] && [ "$$confirm" != "Y" ]; then \
 		echo "❌ Reset aborted."; \
@@ -88,6 +88,6 @@ reset:
 	@echo "Proceeding with full reset..."
 	@docker compose -f srcs/docker-compose.yml down -v --rmi all
 	@echo "Deleting local data directories..."
-	sudo rm -rf $$HOME/data/wordpress $$HOME/data/mariadb
+	sudo rm -rf $$HOME/chdonnat/data/wordpress $$HOME/chdonnat/data/mariadb
 
 re: clean all
