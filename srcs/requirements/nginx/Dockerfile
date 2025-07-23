@@ -13,6 +13,5 @@ RUN apt-get update \
 	&& mkdir -p /var/www/wordpress \
 	&& mkdir -p /var/www/html
 COPY conf/nginx.conf /etc/nginx/nginx.conf
-COPY conf/index.html /var/www/html/index.html
 EXPOSE 443
 CMD ["nginx", "-g", "daemon off;"]

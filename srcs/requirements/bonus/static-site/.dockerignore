@@ -1,0 +1,9 @@
+.git
+.gitignore
+.vscode
+*.swp
+*.log
+*.tmp
+*.bak
+.env
+secrets/

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+    <channel>
+      <title>Quartz 4</title>
+      <link>https://quartz.jzhao.xyz</link>
+      <description>Last 10 notes on Quartz 4</description>
+      <generator>Quartz -- quartz.jzhao.xyz</generator>
+      <item>
+    <title>file double</title>
+    <link>https://quartz.jzhao.xyz/file-double</link>
+    <guid>https://quartz.jzhao.xyz/file-double</guid>
+    <description> Nom anglais: deque Nom pleinement qualifié: std::deque Une file double deque (double-ended queue) est un conteneur séquentiel faisant partie des conteneur standard de la STL en C++.</description>
+    <pubDate>Wed, 23 Jul 2025 17:07:57 GMT</pubDate>
+  </item><item>
+    <title>ex04</title>
+    <link>https://quartz.jzhao.xyz/ex04</link>
+    <guid>https://quartz.jzhao.xyz/ex04</guid>
+    <description> Cet exercice a pour but de nous faire découvrir les bases de la manipulation de fichier en C++.</description>
+    <pubDate>Wed, 23 Jul 2025 17:07:57 GMT</pubDate>
+  </item><item>
+    <title>vecteur</title>
+    <link>https://quartz.jzhao.xyz/vecteur</link>
+    <guid>https://quartz.jzhao.xyz/vecteur</guid>
+    <description> Nom anglais: vector Nom pleinement qualifié: std::vector Un vector est un conteneur dynamique fourni par la STL (Standard Template Library) en C++.</description>
+    <pubDate>Wed, 23 Jul 2025 17:07:57 GMT</pubDate>
+  </item><item>
+    <title>UpperCamelCase</title>
+    <link>https://quartz.jzhao.xyz/UpperCamelCase</link>
+    <guid>https://quartz.jzhao.xyz/UpperCamelCase</guid>
+    <description> Nom anglais: UpperCamelCase / PascalCase (peu utilisé) Le UpperCamelCase est une convention de nommage utilisée notamment pour nommer les classes.</description>
+    <pubDate>Wed, 23 Jul 2025 17:07:57 GMT</pubDate>
+  </item><item>
+    <title>bibliothèque iostream</title>
+    <link>https://quartz.jzhao.xyz/biblioth%C3%A8que-iostream</link>
+    <guid>https://quartz.jzhao.xyz/biblioth%C3%A8que-iostream</guid>
+    <description> Bibliothèque standard: ` La bibliothèque iostream est une composante fondamentale de la bibliothèque standard C++ .</description>
+    <pubDate>Wed, 23 Jul 2025 17:07:57 GMT</pubDate>
+  </item><item>
+    <title>classe dérivée</title>
+    <link>https://quartz.jzhao.xyz/classe-d%C3%A9riv%C3%A9e</link>
+    <guid>https://quartz.jzhao.xyz/classe-d%C3%A9riv%C3%A9e</guid>
+    <description> Nom anglais: derived class / child class Une classe dérivée (ou classe enfant) est une classe qui hérite d’une classe de base (ou classe parent) : on parle d’héritage.</description>
+    <pubDate>Wed, 23 Jul 2025 17:07:57 GMT</pubDate>
+  </item><item>
+    <title>this</title>
+    <link>https://quartz.jzhao.xyz/this</link>
+    <guid>https://quartz.jzhao.xyz/this</guid>
+    <description> Nom anglais: this pointer En C++, le mot-clé this est un pointeur implicite disponible dans chaque méthode non statique d’une classe.</description>
+    <pubDate>Wed, 23 Jul 2025 17:07:57 GMT</pubDate>
+  </item><item>
+    <title>ami</title>
+    <link>https://quartz.jzhao.xyz/ami</link>
+    <guid>https://quartz.jzhao.xyz/ami</guid>
+    <description> Nom anglais: friend (friend function / friend class) En C++, le mot-clé friend permet de déclarer une fonction ou une classe amie d’une autre classe.</description>
+    <pubDate>Wed, 23 Jul 2025 17:07:57 GMT</pubDate>
+  </item><item>
+    <title>cin</title>
+    <link>https://quartz.jzhao.xyz/cin</link>
+    <guid>https://quartz.jzhao.xyz/cin</guid>
+    <description> Nom pleinement qualifié: std::cin std::cin est un objet de la bibliothèque standard C++ qui permet de lire des données depuis l’entrée standard (généralement le clavier).</description>
+    <pubDate>Wed, 23 Jul 2025 17:07:57 GMT</pubDate>
+  </item><item>
+    <title>ex00</title>
+    <link>https://quartz.jzhao.xyz/Module_00/ex00</link>
+    <guid>https://quartz.jzhao.xyz/Module_00/ex00</guid>
+    <description> Ce premier exercice du Module_00 a pour but de nous faire afficher du texte à l’écran et d’utiliser une première fonction de la bibliothèque standard C++ Afficher du texte à l’écran Nous allons pour cela utiliser un objet de la bibliothèque standard C++ : → cout(qui permet d’envoyer des données ver...</description>
+    <pubDate>Wed, 23 Jul 2025 17:07:57 GMT</pubDate>
+  </item>
+    </channel>
+  </rss>

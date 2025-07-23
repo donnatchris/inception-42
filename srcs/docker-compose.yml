@@ -42,6 +42,17 @@ services:
     networks:
       - inception
 
+  static-site:
+    build:
+      context: requirements/bonus/static-site
+    image: static-site:chdonnat42
+    container_name: static-site
+    env_file: .env
+    expose:
+      - "80"
+    networks:
+      - inception
+
 volumes:
   mariadb:
     driver: local
