@@ -2240,8 +2240,10 @@ all:
 	docker compose -f srcs/docker-compose.yml --env-file srcs/.env up -d
 
 clean:
-	docker compose -f srcs/docker-compose.yml down
+	docker compose -f srcs/docker-compose.yml down --rmi all
 ```
+
+> L'option `--rmi all` permet de détruire les images.
 
 #### Makefile complet
 
@@ -2252,7 +2254,10 @@ Pour ma part, j'ai ajouté quelques règles à mon Makefile afin de :
 - Vérifier que les dossiers `~/data/wordpress` et `~/data/mariadb` existent (nécessaires pour la persistances des données) ou les créer lors de l'éxécution si ce n'est pas le cas
 - Vérifier que le DOMAIN_NAME soit bien présent dans le fichier `/etc/hosts` ou bien ajouter la ligne nécesaire au fichier si ce n'est pas le cas
 
-Enfin j'ai ajouté une règle `reset` qui stoppe les conteneurs, supprime les images et supprime les volumes docker ainsi que les répertoires `~/data/wordpress` et `~/data/mariadb` sur la machine hôte (entraînant la fin de la persistance des données).
+Enfin j'ai ajouté les règles :
+
+- `reset` qui stoppe les conteneurs, supprime les images et supprime les volumes docker ainsi que les répertoires `~/data/wordpress` et `~/data/mariadb` sur la machine hôte (entraînant la fin de la persistance des données)
+- `down` qui stoppe les conteneurs sans détruire les images
 
 ```bash
 SHELL := /bin/bash
@@ -2324,10 +2329,15 @@ up:
 	@echo "🐳 Starting docker compose using $(COMPOSE_PATH)..."
 	docker compose --env-file $(ENV_FILE) -f $(COMPOSE_PATH) up -d
 
-# Stop containers without deleting volumes
+# Stop containers and without removing images or deleting volumes
+down:
+	@echo "🛑 Stopping containers without removing images (data preserved)..."
+	docker compose -f srcs/docker-compose.yml down
+
+# Stop containers and remove images without deleting volumes
 clean:
 	@echo "🛑 Stopping containers and removing images (data preserved)..."
-	docker compose -f srcs/docker-compose.yml down
+	docker compose -f srcs/docker-compose.yml down --rmi all
 
 # Full reset: stop, remove containers & volumes, delete local data
 reset:
@@ -2338,7 +2348,7 @@ reset:
 		exit 1; \
 	fi
 	@echo "Proceeding with full reset..."
-	docker compose -f srcs/docker-compose.yml down -v
+	docker compose -f srcs/docker-compose.yml down -v --rmi all
 	@echo "Deleting local data directories..."
 	sudo rm -rf $$HOME/data/wordpress $$HOME/data/mariadb
 ```
