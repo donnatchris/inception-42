@@ -2097,4 +2097,103 @@ networks:
 * `docker compose rm`
   Supprime les conteneurs arrêtés manuellement (sans passer par `down`).
 
+---
+
+## TESTS
+
+Le projet étant bientôt terminé, il est temps de tester si tout fonctionne correctement.
+Voici comment vérifier que notre environnement Docker Compose fonctionne correctement, que WordPress est opérationnel et que les données sont bien persistantes.
+
+### 1. LANCER `docker compose`
+
+Depuis le répertoire racine du projet, lancez :
+
+```bash
+docker compose -f srcs/docker-compose.yml --env-file srcs/.env up -d
+```
+
+Cela démarre tous les conteneurs (WordPress, MariaDB, etc.) en arrière-plan.
+
+Vous pouvez vérifier qu'ils tournent avec :
+
+```bash
+docker ps
+```
+
+Les trois conteneurs nginx, MariaDB et wordpress doivent apparaître dans la liste.
+
+### 2. OUVRIR WORDPRESS DANS LE NAVIGATEUR
+
+Une fois les conteneurs démarrés, ouvrez votre navigateur et allez sur :
+
+```
+https://localhost
+```
+
+Vous devriez voir la page d’accueil de WordPress avec l’article de bienvenue.
+
+### 3. TESTER LA PERSISTANCE DES DONNEES
+
+#### a. Créer une nouvelle page dans WordPress
+
+1. Connectez-vous à l’interface d’administration (en utilisant l'identifiant et le mot de passe défini pour l'administrateur wordpress dans le fichier `.env`):
+
+   ```
+   https://localhost/wp-admin
+   ```
+
+3. Allez dans **Pages > Ajouter**
+
+4. Créez une page appelée **"Test Persistance"** et publiez-la
+
+#### b. Redémarrer la VM hôte (et pas seulement Docker)
+
+1. Stoppez docker avec la commande suivante (qui stoppe les conteneurs et supprime les images sans supprimez les volumes) :
+   
+   ```bash
+	docker compose stop
+   ```
+   
+3. Éteignez totalement la machine virtuelle (VM)
+4. Redémarrez-la
+5. Relancez les conteneurs :
+
+```bash
+docker compose -f srcs/docker-compose.yml --env-file srcs/.env up -d
+```
+
+#### c. Vérifier que la page existe toujours
+
+Retournez sur `https://localhost`, puis allez dans **Pages**.
+Vous devriez voir **"Test Persistance"** toujours présente. Si ce n'est pas le cas, c'est qu'il y a un problème avec les volumes.
+
+### 4. Vérifier la présence de la page dans la base de données MariaDB
+
+Vous pouvez accéder directement à la base MariaDB pour voir si la page est bien enregistrée :
+
+#### a. Entrer dans le conteneur MariaDB
+
+```bash
+docker exec -it mariadb bash
+```
+
+#### b. Se connecter à MariaDB
+
+```bash
+mariadb -u<VOTRE_UTILISATEUR> -p<VOTRE_MOT_DE_PASSE>
+```
+
+> Remplacez `<VOTRE_UTILISATEUR>` et <VOTRE_MOT_DE_PASSE> par les valeurs de `MDB_USER` et `MDB_USER_PASS` dans votre `.env`.
+
+#### c. Interroger la base
+
+```sql
+USE inception;
+SELECT ID, post_title FROM wp_posts;
+```
+
+Vous devriez voir la page **"Test Persistance"** dans les résultats.
+
+Si tous ces tests passent, votre installation est fonctionnelle, persistante, et bien connectée entre les services WordPress et MariaDB.
+
 
