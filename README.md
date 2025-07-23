@@ -2162,6 +2162,8 @@ Vous devriez voir la page d’accueil de WordPress avec l’article de bienvenue
 docker compose -f srcs/docker-compose.yml --env-file srcs/.env up -d
 ```
 
+Le `-f` sert à spécifier le chemin du fichier `docker-compose.yml`. Il serait inutile si nous nous trouvions dans le répertoire contenant le fichier.
+
 #### c. Vérifier que la page existe toujours
 
 Retournez sur `https://localhost`, puis allez dans **Pages**.
@@ -2195,5 +2197,52 @@ SELECT ID, post_title FROM wp_posts;
 Vous devriez voir la page **"Test Persistance"** dans les résultats.
 
 Si tous ces tests passent, votre installation est fonctionnelle, persistante, et bien connectée entre les services WordPress et MariaDB.
+
+---
+
+## MAKEFILE ET DERNIERES TOUCHES
+
+Maintenant que le projet fonctionne, il nous manque quelques détails à finaliser.
+
+### NOM DE DOMAINE
+
+Pour le moment, nous accédons à wordpress dans le navigateur par :
+
+```
+https://localhost
+```
+
+Or le sujet exige que nous puissions aussi y accéder par notre nom de domaine (`<votre_login>.42.fr`).
+Pour que cela fonctionne en local, il faut déclarer ce nom de domaine dans le DNS de la machine, en l’associant à `127.0.0.1` (l’adresse de loopback).
+Il faut donc éditer le fichier `/etc/hosts` et y ajouter la ligne suivante :
+
+```
+127.0.0.1 <votre_login>.42.fr
+```
+
+> Remplacez `<votre_login>` par votre vrai identifiant 42 (ex : `jdupont.42.fr`).
+
+Cette redirection ne fonctionne que sur **votre machine locale**, elle n’est pas publique.
+
+### MAKEFILE
+
+Le sujet n'est pas très explicite au sujet du Makefile. Mais nous pouvons assumer qu'il doit contenir au minimum :
+
+- une règle pour **lancer les conteneurs**
+- une autre pour **les arrêter sans supprimer les volumes**, afin de préserver la persistance des données
+
+#### Makefile minimum
+
+Un Makefile minimum pourrait se contenter de :
+
+```Makefile
+all:
+	docker compose -f srcs/docker-compose.yml --env-file srcs/.env up -d
+
+clean:
+	docker compose -f srcs/docker-compose.yml down
+```
+
+
 
 
