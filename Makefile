@@ -67,10 +67,15 @@ up:
 	@echo "🐳 Starting docker compose using $(COMPOSE_PATH)..."
 	docker compose --env-file $(ENV_FILE) -f $(COMPOSE_PATH) up -d
 
-# Stop containers without deleting volumes
+# Stop containers and without removing images or deleting volumes
+down:
+	@echo "🛑 Stopping containers without removing images (data preserved)..."
+	docker compose -f srcs/docker-compose.yml down
+
+# Stop containers and remove images without deleting volumes
 clean:
 	@echo "🛑 Stopping containers and removing images (data preserved)..."
-	docker compose -f srcs/docker-compose.yml down
+	docker compose -f srcs/docker-compose.yml down --rmi all
 
 # Full reset: stop, remove containers & volumes, delete local data
 reset:
