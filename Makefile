@@ -79,7 +79,7 @@ clean:
 
 # Full reset: stop, remove containers & volumes, delete local data
 reset:
-	@echo "⚠️  WARNING: This will stop containers, remove volumes, and delete local data in ~/chdonnat/data"
+	@echo "⚠️  WARNING: This will stop containers, destroy images, remove volumes, and delete local data in ~/chdonnat/data"
 	@read -p "Are you sure you want to continue? [y/N] " confirm; \
 	if [ "$$confirm" != "y" ] && [ "$$confirm" != "Y" ]; then \
 		echo "❌ Reset aborted."; \
