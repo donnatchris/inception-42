@@ -68,7 +68,7 @@ up:
 	docker compose --env-file $(ENV_FILE) -f $(COMPOSE_PATH) up -d
 
 # Stop containers without deleting volumes
-down:
+clean:
 	@echo "🛑 Stopping containers and removing images (data preserved)..."
 	docker compose -f srcs/docker-compose.yml down
 
@@ -84,4 +84,3 @@ reset:
 	docker compose -f srcs/docker-compose.yml down -v
 	@echo "Deleting local data directories..."
 	sudo rm -rf $$HOME/data/wordpress $$HOME/data/mariadb
-
