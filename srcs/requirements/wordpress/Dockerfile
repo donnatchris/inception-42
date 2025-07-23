@@ -22,7 +22,7 @@ RUN apt update -y \
 RUN mkdir -p /run/php
 
 COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
-# lwejw
+
 RUN mkdir -p /var/www \
 	&& curl -o /var/www/wordpress.tar.gz https://fr.wordpress.org/wordpress-6.8.2-fr_FR.tar.gz \
     && tar -xzf /var/www/wordpress.tar.gz -C /var/www \

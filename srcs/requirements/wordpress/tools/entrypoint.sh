@@ -2,7 +2,7 @@
 
 # waiting for MariaDB
 until mysqladmin ping -h"mariadb" -u"$MDB_USER" -p"$MDB_USER_PASS" --silent; do
-  echo "⏳ Waiting for MariaDB to be ready..."
+  echo "Waiting for MariaDB to be ready..."
   sleep 2
 done
 
