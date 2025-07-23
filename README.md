@@ -2243,6 +2243,21 @@ clean:
 	docker compose -f srcs/docker-compose.yml down
 ```
 
+#### Makefile complet
+
+Pour ma part, j'ai ajouté quelques règles à mon Makefile afin de :
+
+- Vérifier que le fichier `.env` est bien présent lors de l'éxecution de la commande `make`
+- Vérifier que chacune des  variables d'environnement nécessaires au projet sont bien existantes et non nulles (ce qui me permet au passage de supprimer les vérifications de variables dans les scripts)
+- Vérifier que les dossiers `~/data/wordpress` et `~/data/mariadb` existent (nécessaires pour la persistances des données) ou les créer lors de l'éxécution si ce n'est pas le cas
+- Vérifier que le DOMAIN_NAME soit bien présent dans le fichier `/etc/hosts` ou bien ajouter la ligne nécesaire au fichier si ce n'est pas le cas
+
+Enfin j'ai ajouté une règle `reset` qui supprime les volumes docker ainsi que les répertoires `~/data/wordpress` et `~/data/mariadb` sur la machine hôte.
+
+```bash
+
+```
+
 
 
 
