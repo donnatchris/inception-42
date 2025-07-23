@@ -1,6 +1,8 @@
 services:
   mariadb:
-    build: requirements/mariadb
+    build:
+      context: requirements/mariadb
+    image: mariadb:chdonnat42
     container_name: mariadb
     env_file: .env
     volumes:
@@ -11,7 +13,9 @@ services:
       - inception
 
   wordpress:
-    build: requirements/wordpress
+    build:
+      context: requirements/wordpress
+    image: wordpress:chdonnat42
     container_name: wordpress
     env_file: .env
     depends_on:
@@ -24,7 +28,9 @@ services:
       - inception
 
   nginx:
-    build: requirements/nginx
+    build:
+      context: requirements/nginx
+    image: nginx:chdonnat42
     container_name: nginx
     env_file: .env
     depends_on:

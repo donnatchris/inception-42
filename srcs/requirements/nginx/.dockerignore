@@ -1,4 +1,9 @@
 .git
-Dockerfile
+.gitignore
+.vscode
+*.swp
 *.log
-node_modules
+*.tmp
+*.bak
+.env
+secrets/
