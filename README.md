@@ -2424,28 +2424,21 @@ Pour éviter cela, il est indispensable de créer un fichier `.dockerignore` dan
 
 Ce fichier fonctionne exactement comme un `.gitignore` : chaque ligne indique un chemin ou un motif à ignorer.
 
-Voici un exemple de contenu recommandé :
+Pour ma part, jai créé le même `.dockerignore` pour chacune des images :
 
 ```
-# Fichiers sensibles
-.env
-secrets/
-
-# Éditeurs
-.vscode/
-*.swp
-
-# Git
-.git
-.gitignore
-
-# Fichiers temporaires
-*.log
-*.tmp
-*.bak
+.git         # Ne pas envoyer l’historique Git
+.gitignore   # Fichier inutile pour le build
+.vscode      # Dossier de configuration de l’éditeur (Visual Studio Code)
+*.swp        # Fichiers temporaires de Vim
+*.log        # Fichiers de logs
+*.tmp        # Fichiers temporaires divers
+*.bak        # Sauvegardes automatiques
+.env         # Fichier contenant les variables d’environnement sensibles
+secrets/     # Répertoire contenant les mots de passe ou informations critiques
 ```
 
-> Important : même si on copie manuellement certains fichiers via `COPY` dans notre `Dockerfile`, ils **doivent quand même être accessibles dans le contexte**.
+> Important : même si nous copions manuellement certains fichiers via `COPY` dans notre `Dockerfile`, ils **doivent quand même être accessibles dans le contexte**.
 > Un fichier ignoré dans `.dockerignore` **ne pourra pas être copié**, sauf s’il est explicitement **hors du dossier ignoré**.
 
 
