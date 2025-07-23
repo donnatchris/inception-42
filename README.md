@@ -2412,3 +2412,40 @@ services:
 
 Dès lors, Docker ne trouvera pas d’image `mariadb:inception42` sur Docker Hub, et construira bien la notre à partir du `Dockerfile`.
 
+### DOCKERIGNORE
+
+Lorsque Docker construit une image à partir d’un contexte (`build.context`), **il copie l’ensemble des fichiers du répertoire source** pour les envoyer au démon Docker.
+Cela peut inclure des fichiers inutiles (comme `.env`, des logs, des fichiers temporaires, le dossier `.git`, ou même des secrets), ce qui peut :
+
+* ralentir considérablement le build
+* **poser des risques de sécurité** si des données sensibles sont accidentellement copiées dans l’image
+
+Pour éviter cela, il est indispensable de créer un fichier `.dockerignore` dans **chaque dossier contenant un `Dockerfile`** (typiquement : `requirements/nginx/`, `requirements/mariadb/`, `requirements/wordpress/`).
+
+Ce fichier fonctionne exactement comme un `.gitignore` : chaque ligne indique un chemin ou un motif à ignorer.
+
+Voici un exemple de contenu recommandé :
+
+```
+# Fichiers sensibles
+.env
+secrets/
+
+# Éditeurs
+.vscode/
+*.swp
+
+# Git
+.git
+.gitignore
+
+# Fichiers temporaires
+*.log
+*.tmp
+*.bak
+```
+
+> Important : même si on copie manuellement certains fichiers via `COPY` dans notre `Dockerfile`, ils **doivent quand même être accessibles dans le contexte**.
+> Un fichier ignoré dans `.dockerignore` **ne pourra pas être copié**, sauf s’il est explicitement **hors du dossier ignoré**.
+
+
