@@ -1695,6 +1695,12 @@ WP_USER_PASS=<password>
 ```bash
 #!/bin/bash
 
+until mysqladmin ping -h"mariadb" -u"$MDB_USER" -p"$MDB_USER_PASS" --silent; do
+  # Afficher un message toutes les 2 secondes pendant l'attente
+  echo "Waiting for MariaDB to be ready..."
+  sleep 2
+done
+
 if [ ! -f wp-config.php ]; then
 	echo "Creating wp-config.php..."
 
@@ -1745,6 +1751,18 @@ if [ ! -f wp-config.php ]; then
 ```
 
 Teste si le fichier `wp-config.php` n’existe pas encore. Si c’est le cas, cela signifie que WordPress n’est pas encore configuré
+
+```bash
+until mysqladmin ping -h"mariadb" -u"$MDB_USER" -p"$MDB_USER_PASS" --silent; do
+  echo "Waiting for MariaDB to be ready..."
+  sleep 2
+done
+```
+
+Avant de lancer l'installation de WordPress avec WP-CLI, on vérifie que le service MariaDB est bien opérationnel.
+On utilise `mysqladmin ping` pour tester la connexion à la base en boucle.
+Tant que la base de données n'est pas disponible (le conteneur MariaDB démarre souvent plus lentement), le script attend et affiche un message toutes les 2 secondes.
+Cela garantit que WordPress ne tente pas de se connecter trop tôt à MariaDB, ce qui entrainerait une erreur d'installation.
 
 ```bash
     wp config create \
