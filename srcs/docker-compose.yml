@@ -58,14 +58,14 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ~/chdonnat/data/mariadb
+      device: /home/chdonnat/data/mariadb
       o: bind
 
   wordpress:
     driver: local
     driver_opts:
       type: none
-      device: ~/chdonnat/data/wordpress
+      device: /home/chdonnat/data/wordpress
       o: bind
 
 networks:

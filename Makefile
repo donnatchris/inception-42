@@ -41,14 +41,14 @@ check_vars: check_env
 
 # Create ~/chdonnat/data/wordpress and ~/chdonnat/data/mariadb if they don't exist
 setup_dirs:
-	@echo "Checking ~/chdonnat/data/wordpress and ~/chdonnat/data/mariadb directories..."
-	@if [ ! -d "$$HOME/chdonnat/data/wordpress" ]; then \
-		echo "Creating $$HOME/chdonnat/data/wordpress directory"; \
-		mkdir -p "$$HOME/chdonnat/data/wordpress"; \
+	@echo "Checking /home/chdonnat/data/wordpress and /home/chdonnat/data/mariadb directories..."
+	@if [ ! -d "/home/chdonnat/data/wordpress" ]; then \
+		echo "Creating /home/chdonnat/data/wordpress directory"; \
+		mkdir -p "/home/chdonnat/data/wordpress"; \
 	fi
-	@if [ ! -d "$$HOME/chdonnat/data/mariadb" ]; then \
-		echo "Creating $$HOME/chdonnat/data/mariadb directory"; \
-		mkdir -p "$$HOME/chdonnat/data/mariadb"; \
+	@if [ ! -d "/home/chdonnat/data/mariadb" ]; then \
+		echo "Creating /home/chdonnat/data/mariadb directory"; \
+		mkdir -p "/home/chdonnat/data/mariadb"; \
 	fi
 
 # Add 127.0.0.1 DOMAIN_NAME to /etc/hosts if missing
@@ -88,6 +88,6 @@ reset:
 	@echo "Proceeding with full reset..."
 	@docker compose -f srcs/docker-compose.yml down -v --rmi all
 	@echo "Deleting local data directories..."
-	sudo rm -rf $$HOME/chdonnat/data/wordpress $$HOME/chdonnat/data/mariadb
+	sudo rm -rf /home/chdonnat/data/wordpress /home/chdonnat/data/mariadb
 
 re: clean all
