@@ -68,7 +68,7 @@ La seule différence est que je **n’utilise pas de dossier `secrets/`** : tous
 - [Docker Wordpress](#docker-wordpress)
 - [Finaliser le docker-compose](#finaliser-le-fichier-docker-composeyml)
 - [Tests](#tests)
-- [Tests](#tests)
+- [Makefile et dernières touches](#makefile-et-dernieres-touches)
 
 ## QUELQUES DEFINITIONS
 
