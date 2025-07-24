@@ -1,6 +1,8 @@
 # PROJECT INCEPTION FOR 42
 By chdonnat (Christophe Donnat from 42 Perpignan, France)
 
+[🇬🇧 English version](README.md)
+
 ## AIM OF THE PROJECT:
 
 The goal of the Inception project is to set up a secure and functional Docker-based infrastructure by containerizing several services (like Nginx, WordPress, and MariaDB) and orchestrating them with docker-compose.
