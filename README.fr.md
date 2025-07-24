@@ -1,60 +1,60 @@
-# PROJECT INCEPTION FOR 42
-By chdonnat (Christophe Donnat from 42 Perpignan, France)
+# PROJET INCEPTION POUR 42
+Par chdonnat (Christophe Donnat de 42 Perpignan, France)  
 
 [🇬🇧 English version](README.md)
 
-## AIM OF THE PROJECT:
+## OBJECTIF DU PROJET :
 
-The goal of the Inception project is to set up a secure and functional Docker-based infrastructure by containerizing several services (like Nginx, WordPress, and MariaDB) and orchestrating them with docker-compose.
-It helps you learn about containerization, networking, volumes, and service dependencies in a real-world deployment environment.
+Le but du projet Inception est de mettre en place une infrastructure sécurisée et fonctionnelle basée sur Docker, en conteneurisant plusieurs services (comme Nginx, WordPress et MariaDB) et en les orchestrant avec docker-compose.  
+Cela permet d'apprendre la conteneurisation, le réseau, les volumes et la gestion des dépendances entre services dans un environnement de déploiement proche du réel.
 
-### BONUS PART
+### PARTIE BONUS
 
-I have completed two bonus features for this project:
+J'ai ajouté deux fonctionnalités bonus à ce projet :
 
-* **Adminer**: a graphical interface for managing databases.
-* **Static Site**: I converted the Obsidian vault I created while learning C++ into a complete static website using Quartz.
+* **Adminer** : une interface graphique pour gérer les bases de données.
+* **Site statique** : j'ai converti le coffre Obsidian que j'avais créé en apprenant le C++ en un site statique complet grâce à Quartz.
 
-## SOME COMMANDS YOU CAN USE:
+## QUELQUES COMMANDES UTILES :
 
-### Commands from the Makefile
+### Commandes disponibles dans le Makefile
 
-* Launch the entire project:
+* Lancer l’ensemble du projet :
 
   ```bash
   make
   ```
 
-* Stop and remove the containers (without deleting the data):
+* Arrêter et supprimer les conteneurs (sans effacer les données) :
 
   ```bash
   make clear
   ```
 
-* Reset everything (containers and data):
+* Tout réinitialiser (conteneurs + données) :
 
   ```bash
   make reset
   ```
 
-### After running `make`, you can access the following in your web browser:
+### Après avoir lancé `make`, vous pouvez accéder dans votre navigateur à :
 
-* Visit the WordPress site:
+* Le site WordPress :
   [https://localhost](https://localhost)
 
-* Access the WordPress admin panel:
+* L’interface d’administration de WordPress :
   [https://localhost/wp-admin](https://localhost/wp-admin)
 
-* View the static site (you can learn C++ from it!):
+* Le site statique (vous pouvez y apprendre le C++ !) :
   [https://localhost/static/](https://localhost/static/)
 
-* Open Adminer (graphical database manager):
+* L’interface Adminer (gestionnaire de base de données graphique) :
   [https://localhost/adminer/](https://localhost/adminer/)
 
 ## ARCHITECTURE
 
-For this project, I followed the architecture provided in the subject.
-The only difference is that I do not use a `secrets/` directory — all passwords and credentials are stored in the `.env` file instead.
+Pour ce projet, j’ai suivi l’architecture fournie dans le sujet.
+La seule différence est que je **n’utilise pas de dossier `secrets/`** : tous les mots de passe et identifiants sont stockés dans le fichier `.env` à la place.
 
 ---
 
