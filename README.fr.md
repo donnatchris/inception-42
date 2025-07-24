@@ -3,6 +3,8 @@ Par chdonnat (Christophe Donnat de 42 Perpignan, France)
 
 [🇬🇧 Go to English version](README.md)
 
+![Screeshot of the static website](images/static-site.png)
+
 ## OBJECTIF DU PROJET :
 
 Le but du projet Inception est de mettre en place une infrastructure sécurisée et fonctionnelle basée sur Docker, en conteneurisant plusieurs services (comme Nginx, WordPress et MariaDB) et en les orchestrant avec docker-compose.  
