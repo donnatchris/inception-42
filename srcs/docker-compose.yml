@@ -5,6 +5,7 @@ services:
     image: mariadb:chdonnat42
     container_name: mariadb
     env_file: .env
+    restart: unless-stopped
     volumes:
       - mariadb:/var/lib/mysql
     expose:
@@ -18,6 +19,7 @@ services:
     image: wordpress:chdonnat42
     container_name: wordpress
     env_file: .env
+    restart: unless-stopped
     depends_on:
       - mariadb
     volumes:
@@ -33,6 +35,7 @@ services:
     image: nginx:chdonnat42
     container_name: nginx
     env_file: .env
+    restart: unless-stopped
     depends_on:
       - wordpress
     ports:
@@ -48,6 +51,7 @@ services:
     image: static-site:chdonnat42
     container_name: static-site
     env_file: .env
+    restart: unless-stopped
     expose:
       - "80"
     networks:
@@ -59,6 +63,7 @@ services:
     image: adminer:chdonnat42
     container_name: adminer
     env_file: .env
+    restart: unless-stopped
     depends_on:
       - mariadb
     expose:
