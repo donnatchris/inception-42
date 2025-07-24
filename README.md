@@ -1,9 +1,9 @@
 # PROJECT INCEPTION FOR 42
 Par chdonnat (Christophe Donnat from 42 Perpignan, France)
 
-![Aperçu du site statique](images/static-site.png)
-
 [🇫🇷 voir la version française](README.fr.md)
+
+![Aperçu du site statique](images/static-site.png)
 
 ## AIM OF THE PROJECT:
 
