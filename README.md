@@ -1,5 +1,60 @@
-# inception
-project inception (docker) for 42
+# PROJECT INCEPTION FOR 42
+By chdonnat (Christophe Donnat from 42 Perpignan, France)
+
+## AIM OF THE PROJECT:
+
+The goal of the Inception project is to set up a secure and functional Docker-based infrastructure by containerizing several services (like Nginx, WordPress, and MariaDB) and orchestrating them with docker-compose.
+It helps you learn about containerization, networking, volumes, and service dependencies in a real-world deployment environment.
+
+### BONUS PART
+
+I have completed two bonus features for this project:
+
+* **Adminer**: a graphical interface for managing databases.
+* **Static Site**: I converted the Obsidian vault I created while learning C++ into a complete static website using Quartz.
+
+## SOME COMMANDS YOU CAN USE:
+
+### Commands from the Makefile
+
+* Launch the entire project:
+
+  ```bash
+  make
+  ```
+
+* Stop and remove the containers (without deleting the data):
+
+  ```bash
+  make clear
+  ```
+
+* Reset everything (containers and data):
+
+  ```bash
+  make reset
+  ```
+
+### After running `make`, you can access the following in your web browser:
+
+* Visit the WordPress site:
+  [https://localhost](https://localhost)
+
+* Access the WordPress admin panel:
+  [https://localhost/wp-admin](https://localhost/wp-admin)
+
+* View the static site (you can learn C++ from it!):
+  [https://localhost/static/](https://localhost/static/)
+
+* Open Adminer (graphical database manager):
+  [https://localhost/adminer/](https://localhost/adminer/)
+
+## ARCHITECTURE
+
+For this project, I followed the architecture provided in the subject.
+The only difference is that I do not use a `secrets/` directory — all passwords and credentials are stored in the `.env` file instead.
+
+---
 
 # TUTO COMPLET
 
