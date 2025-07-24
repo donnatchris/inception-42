@@ -66,8 +66,9 @@ La seule différence est que je **n’utilise pas de dossier `secrets/`** : tous
 - [Docker Nginx](#docker-nginx)
 - [Docker MariaDB](#docker-mariadb)
 - [Docker Wordpress](#docker-wordpress)
-- [Useful Commands](#useful-commands)
-- [License](#license)
+- [Finaliser le docker-compose](#finaliser-le-fichier-docker-compose.yml)
+- [Tests](#tests)
+- [Tests](#tests)
 
 ## QUELQUES DEFINITIONS
 
