@@ -1,6 +1,8 @@
 # PROJECT INCEPTION FOR 42
 By chdonnat (Christophe Donnat from 42 Perpignan, France)
 
+[🇫🇷 Lire ce README en français](README.fr.md)
+
 ## AIM OF THE PROJECT:
 
 The goal of the Inception project is to set up a secure and functional Docker-based infrastructure by containerizing several services (like Nginx, WordPress, and MariaDB) and orchestrating them with docker-compose.
@@ -56,60 +58,59 @@ The only difference is that I do not use a `secrets/` directory — all password
 
 ---
 
-# TUTO COMPLET
+# COMPLETE TUTORIAL
 
-## QUELQUES DEFINITIONS
+## SOME DEFINITIONS
 
 ### 🐳 **Docker**
 
-**Docker** est un outil qui permet d’exécuter des applications dans des environnements isolés et reproductibles appelés *conteneurs*.
-Plutôt que d’installer manuellement chaque dépendance sur le système hôte, Docker regroupe l’ensemble des éléments nécessaires (code, bibliothèques, configuration) dans une unité autonome et portable.
+**Docker** is a tool that allows you to run applications in isolated and reproducible environments called *containers*.
+Instead of manually installing each dependency on the host system, Docker bundles all the necessary elements (code, libraries, configuration) into a self-contained and portable unit.
 
-> *Docker peut être comparé à une cuisine entièrement équipée dans une boîte : où qu’elle soit déployée, elle permet de préparer exactement le même plat avec les mêmes outils.*
-> Ainsi, une application s’exécute de manière fiable, quel que soit l’environnement.
+> *Docker can be compared to a fully equipped kitchen in a box: wherever it is deployed, it allows you to prepare the exact same dish with the same tools.*
+> Thus, an application runs reliably, regardless of the environment.
 
-### 📦 **Image Docker**
+### 📦 **Docker Image**
 
-Une **image Docker** est une sorte de **recette prête à l’emploi** : elle contient tous les fichiers nécessaires pour créer un conteneur, y compris le système de fichiers, les bibliothèques, le code applicatif, et les commandes d’initialisation.
-Les images sont **immutables**, ce qui les rend fiables, reproductibles, et facilement partageables.
+A **Docker image** is a kind of **ready-to-use recipe**: it contains all the files needed to create a container, including the file system, libraries, application code, and initialization commands.
+Images are **immutable**, which makes them reliable, reproducible, and easily shareable.
 
-### 🧱 **Conteneur Docker**
+### 🧱 **Docker Container**
 
-Un **conteneur** est une **instance active d’une image**. Il s’agit d’un processus isolé qui exécute l’application définie par l’image.
+A **container** is an **active instance of an image**. It is an isolated process that runs the application defined by the image.
 
-> *Si l’image représente la recette, le conteneur est le plat effectivement préparé.*
-> Chaque conteneur peut être démarré, arrêté, supprimé ou recréé à volonté, sans impacter le système ou les autres conteneurs.
+> *If the image represents the recipe, the container is the dish actually prepared.*
+> Each container can be started, stopped, deleted, or recreated at will, without impacting the system or other containers.
 
 ### 🧩 **Docker Compose**
 
-**Docker Compose** est un outil permettant de **définir et de lancer plusieurs conteneurs Docker en une seule commande**, à l’aide d’un fichier `docker-compose.yml`.
-Ce fichier décrit les services nécessaires (par exemple : un serveur web, une base de données), leur configuration, leurs connexions réseau et les volumes partagés.
-Une fois configuré, l’ensemble peut être lancé avec :
+**Docker Compose** is a tool for **defining and running multiple Docker containers with a single command**, using a `docker-compose.yml` file.
+This file describes the necessary services (e.g., a web server, a database), their configuration, their network connections, and shared volumes.
+Once configured, the entire stack can be launched with:
 
 ```bash
 docker compose up
 ```
 
-> *Cela revient à confier à un chef un menu complet à préparer, chaque plat ayant ses ustensiles, ses ingrédients et son timing.*
+> *It's like giving a chef a complete menu to prepare, where each dish has its own utensils, ingredients, and timing.*
 
 ---
 
-## DOCKER NGINX
+## NGINX DOCKER
 
-Nginx est un serveur web performant et léger, conçu pour gérer efficacement un grand nombre de connexions simultanées.
-Dans le projet Inception, il sert à recevoir les requêtes HTTPS des clients et à les transmettre, selon le cas :
-- soit directement (pour des fichiers statiques comme HTML ou CSS),
-- soit à un service en arrière-plan comme PHP-FPM (pour exécuter WordPress).
-C’est le point d’entrée du site web, le composant qui fait l’interface entre le monde extérieur et les services internes du projet.
+Nginx is a high-performance, lightweight web server designed to efficiently handle a large number of concurrent connections.
+In the Inception project, it is used to receive HTTPS requests from clients and forward them, depending on the case:
+- either directly (for static files like HTML or CSS),
+- or to a background service like PHP-FPM (to run WordPress).
+It is the entry point of the website, the component that interfaces between the outside world and the project's internal services.
 
+To create the Nginx docker, you first need to create a configuration file for Nginx, then a Dockerfile that will create the docker from a Debian or Alpine image.
 
-Pour realiser le docker Nginx , il faut d'abord créer un fichier de configuration pour Nginx, puis un  Dockerfile qui creera le docker a partir d'une image Debian ou Alpine.
+### NGINX CONFIGURATION FILE `nginx.conf`
 
-### FICHIER DE CONFIGURATION NGINX `nginx.conf`
+An Nginx configuration file consists of blocks followed by curly braces `{}` containing instructions. Each instruction consists of its name, a space, then its argument(s) separated by spaces if there are several, ending with a semicolon `;`. Some blocks will be contained within a "parent" block.
 
-Un fichier de configuration Nginx est constitué de blocs suivis d’accolades `{}` contenant les instructions. Chaque instruction est constituée de son nom, d’un espace, puis de son ou ses arguments séparés par des espaces s’il y en a plusieurs, terminée par un point-virgule `;`. Certains blocs seront contenus à l’intérieur d’un bloc "parent".
-
-Exemple minimal de `nginx.conf` :
+Minimal example of `nginx.conf`:
 
 ```nginx
 events {}
@@ -126,98 +127,98 @@ http {
 }
 ```
 
-#### Bloc `events {}`
+#### `events {}` Block
 
-Il configure la manière dont Nginx gère les connexions réseau (par exemple, combien de connexions simultanées peuvent être traitées). Pour une configuration simple ou un usage dans Docker, on peut laisser ce bloc vide : `events {}`
+It configures how Nginx handles network connections (e.g., how many concurrent connections can be processed). For a simple configuration or use in Docker, this block can be left empty: `events {}`
 
-#### Bloc `http {}`
+#### `http {}` Block
 
-Il définit toutes les directives liées au protocole HTTP : les serveurs web que Nginx va gérer, les logs, les types de contenu, etc.
+It defines all directives related to the HTTP protocol: the web servers Nginx will manage, logs, content types, etc.
 
-Il peut contenir les directives suivantes :
+It can contain the following directives:
 
-* `access_log` Détermine où sont redirigés les logs d’accès. On lui donne l’argument `/proc/self/fd/1`, qui est un chemin spécial dans Linux permettant à un processus (comme Nginx) d’écrire directement dans sa sortie standard (stdout). Docker capte automatiquement stdout et stderr de chaque conteneur, ce qui permet d’accéder aux logs de Nginx avec une simple commande : `docker logs <nom_du_conteneur>`
+* `access_log` Determines where access logs are redirected. We give it the argument `/proc/self/fd/1`, which is a special path in Linux allowing a process (like Nginx) to write directly to its standard output (stdout). Docker automatically captures stdout and stderr from each container, allowing access to Nginx logs with a simple command: `docker logs <container_name>`
 
-* `error_log` Idem mais pour les logs d’erreurs, qu’on redirige vers la sortie d’erreur avec l’argument `/proc/self/fd/2`
+* `error_log` Same for error logs, which are redirected to the error output with the argument `/proc/self/fd/2`
 
-* `include` Sert à inclure le contenu d’un autre fichier dans le fichier de configuration principal de Nginx. On lui passe l’argument `/etc/nginx/mime.types` afin de charger les types **MIME** (associations entre extensions de fichiers et leur type de contenu, comme .html → text/html ou .png → image/png), indispensable pour servir des fichiers statiques.
+* `include` Used to include the content of another file in the main Nginx configuration file. We pass it the argument `/etc/nginx/mime.types` to load **MIME** types (associations between file extensions and their content type, like .html → text/html or .png → image/png), which is essential for serving static files.
 
-* `default_type` Définit le type MIME par défaut si aucun n’est trouvé. On lui donne l’argument `application/octet-stream`, qui signifie que c’est un fichier binaire générique (ce qui déclenchera le plus souvent un téléchargement par le client).
+* `default_type` Defines the default MIME type if none is found. We give it the argument `application/octet-stream`, which means it is a generic binary file (which will most often trigger a download by the client).
 
-Le bloc `http` contient aussi le ou les blocs `server` (un seul pour les besoins de Inception).
+The `http` block also contains the `server` block(s) (only one for the needs of Inception).
 
-#### Bloc `server {}`
+#### `server {}` Block
 
-Ce bloc définit un serveur virtuel, c’est-à-dire une instance de serveur web que Nginx va gérer. Il doit obligatoirement être placé à l’intérieur d’un bloc `http`.
+This block defines a virtual server, i.e., a web server instance that Nginx will manage. It must be placed inside an `http` block.
 
-Il peut contenir les directives suivantes :
+It can contain the following directives:
 
-* `listen` Définit le port sur lequel le serveur va écouter les requêtes. Pour un serveur HTTP classique, on utilise `listen 80;`. Pour un serveur HTTPS (comme dans Inception), on utilise `listen 443 ssl;`. Si la configuration Nginx contient uniquement `listen 443 ssl;`, alors le serveur ne répond qu’aux requêtes HTTPS. Toute tentative de connexion via HTTP (port 80) échouera. Pour une expérience fluide, on peut ajouter un second bloc server qui écoute le port 80 et redirige vers HTTPS:
+* `listen` Defines the port on which the server will listen for requests. For a classic HTTP server, we use `listen 80;`. For an HTTPS server (as in Inception), we use `listen 443 ssl;`. If the Nginx configuration only contains `listen 443 ssl;`, then the server only responds to HTTPS requests. Any attempt to connect via HTTP (port 80) will fail. For a smooth experience, you can add a second server block that listens on port 80 and redirects to HTTPS:
 
 ```nginx
 server {
     listen 80;
-    server_name localhost <votre_login>.42.fr;
+    server_name localhost <your_login>.42.fr;
     return 301 https://$host$request_uri;
 }
 ```
 
-* `server_name` Spécifie les noms de domaine ou adresses IP que ce serveur va accepter. Exemple : `server_name localhost;` ou `server_name ${DOMAIN_NAME} localhost;` si on utilise une variable d’environnement dans Docker (le nom de domaine pour Inception sera "<votre_login>.42.fr").
+* `server_name` Specifies the domain names or IP addresses that this server will accept. Example: `server_name localhost;` or `server_name ${DOMAIN_NAME} localhost;` if using an environment variable in Docker (the domain name for Inception will be "<your_login>.42.fr").
 
-* `root` Indique le chemin du dossier racine du site, c’est-à-dire là où se trouvent les fichiers à servir. Exemple : `root /var/www/wordpress;`. Ce chemin correspond au volume monté dans le conteneur Nginx pour accéder aux fichiers WordPress. Dans le projet Inception, WordPress tourne dans son propre conteneur (wordpress), mais le conteneur Nginx a aussi besoin d’accéder aux fichiers statiques de WordPress pour pouvoir les servir (HTML, CSS, images, fichiers PHP à passer à PHP-FPM, etc.). *→ Voir plus bas le paragraphe sur les volumes*.
+* `root` Indicates the path to the site's root folder, i.e., where the files to be served are located. Example: `root /var/www/wordpress;`. This path corresponds to the volume mounted in the Nginx container to access WordPress files. In the Inception project, WordPress runs in its own container (wordpress), but the Nginx container also needs to access WordPress's static files to serve them (HTML, CSS, images, PHP files to be passed to PHP-FPM, etc.). *→ See the paragraph on volumes below*.
 
-* `index` Spécifie le ou les fichiers à rechercher par défaut lorsqu’un utilisateur accède à un répertoire. Exemple : `index index.php index.html index.htm;`.
+* `index` Specifies the default file(s) to search for when a user accesses a directory. Example: `index index.php index.html index.htm;`.
 
-* `ssl_certificate` et `ssl_certificate_key` Obligatoires si on active SSL avec `listen 443 ssl;`. Ces directives désignent le chemin vers le certificat SSL et sa clé privée. Exemple :
+* `ssl_certificate` and `ssl_certificate_key` Mandatory if SSL is enabled with `listen 443 ssl;`. These directives specify the path to the SSL certificate and its private key. Example:
 
   ```
   ssl_certificate     /etc/ssl/certs/nginx.crt;
   ssl_certificate_key /etc/ssl/private/nginx.key;
   ```
 
-* `ssl_protocols` Permet de choisir les versions de TLS autorisées. Exemple : `ssl_protocols TLSv1.2 TLSv1.3;` (recommandé pour la sécurité).
+* `ssl_protocols` Allows choosing the authorized TLS versions. Example: `ssl_protocols TLSv1.2 TLSv1.3;` (recommended for security).
 
-> **Note : SSL, TLS et HTTPS**
+> **Note: SSL, TLS, and HTTPS**
 >
-> Le terme **SSL** (*Secure Sockets Layer*) est couramment utilisé, mais il est techniquement dépassé : aujourd’hui, on utilise en réalité **TLS** (*Transport Layer Security*), une version plus moderne et plus sécurisée du protocole.
+> The term **SSL** (*Secure Sockets Layer*) is commonly used, but it is technically outdated: today, we actually use **TLS** (*Transport Layer Security*), a more modern and secure version of the protocol.
 >
-> Malgré cela, le mot **“SSL” reste largement employé** dans la documentation, les outils (comme `ssl_certificate`) et les configurations, même lorsqu’on parle de TLS.
+> Despite this, the word **“SSL” remains widely used** in documentation, tools (like `ssl_certificate`), and configurations, even when talking about TLS.
 >
-> Quand un serveur web utilise SSL/TLS, il chiffre les communications avec le client. Cela permet d’assurer :
+> When a web server uses SSL/TLS, it encrypts communications with the client. This ensures:
 >
-> * la **confidentialité** des échanges (personne ne peut lire les données),
-> * l’**authenticité** du serveur (via le certificat),
-> * l’**intégrité** des données échangées.
+> * the **confidentiality** of exchanges (no one can read the data),
+> * the **authenticity** of the server (via the certificate),
+> * the **integrity** of the exchanged data.
 >
-> C’est ce qui différencie :
+> This is what differentiates:
 >
-> * **HTTP** : communication en clair, non sécurisée
-> * **HTTPS** : communication **chiffrée** et **sécurisée** via SSL/TLS
+> * **HTTP**: communication in clear text, not secure
+> * **HTTPS**: **encrypted** and **secure** communication via SSL/TLS
 >
-> Pour activer HTTPS sur un serveur Nginx, il faut :
+> To enable HTTPS on an Nginx server, you need:
 >
-> * un **certificat** (`.crt`)
-> * une **clé privée** (`.key`)
-> * et la directive `listen 443 ssl;` dans le bloc `server {}`
+> * a **certificate** (`.crt`)
+> * a **private key** (`.key`)
+> * and the `listen 443 ssl;` directive in the `server {}` block
 >
-> Dans le cadre du projet Inception, on utilise des certificats auto-signés, créés automatiquement lors de la construction du conteneur Nginx.
-> Cela se fera dans le Dockerfile, à l’aide de la commande `openssl`.
-> Ces certificats ne sont pas validés par une autorité de certification : ils sont uniquement destinés à un usage local ou pédagogique.
-> Le navigateur affichera une alerte de sécurité, ce qui est normal.
+> In the Inception project, we use self-signed certificates, created automatically when building the Nginx container.
+> This will be done in the Dockerfile, using the `openssl` command.
+> These certificates are not validated by a certification authority: they are only intended for local or educational use.
+> The browser will display a security alert, which is normal.
 
-Le bloc `server` peut également contenir des blocs `location` qui définissent le comportement pour certaines URL (comme `/`, ou toutes les URLs se terminant par `.php`, etc.).
+The `server` block can also contain `location` blocks that define the behavior for certain URLs (like `/`, or all URLs ending in `.php`, etc.).
 
-#### Blocs `location {}`
+#### `location {}` Blocks
 
-Un bloc `location` permet de définir un **comportement spécifique pour une ou plusieurs URL**. Il s’écrit à l’intérieur d’un bloc `server` et commence par un motif (chemin ou expression régulière) suivi d’accolades contenant des directives.
+A `location` block allows you to define a **specific behavior for one or more URLs**. It is written inside a `server` block and starts with a pattern (path or regular expression) followed by curly braces containing directives.
 
-Il peut y avoir plusieurs blocs `location`, chacun correspondant à un cas précis.
+There can be several `location` blocks, each corresponding to a specific case.
 
-Voici les plus utilisés dans Inception :
+Here are the most used in Inception:
 
 * `location / {}`
-  Ce bloc s’applique à la **racine du site** (toutes les requêtes qui ne correspondent à rien de plus précis).
-  Exemple :
+  This block applies to the **root of the site** (all requests that do not match anything more specific).
+  Example:
 
   ```nginx
   location / {
@@ -225,13 +226,13 @@ Voici les plus utilisés dans Inception :
   }
   ```
 
-Cela signifie : "essaie d’abord de servir le fichier tel quel (`$uri`), puis en tant que répertoire (`$uri/`), et si rien n’est trouvé, renvoie une erreur 404". Cette directive est essentielle pour éviter que Nginx tente d’interpréter des chemins inexistants.
+This means: "first try to serve the file as is (`$uri`), then as a directory (`$uri/`), and if nothing is found, return a 404 error". This directive is essential to prevent Nginx from trying to interpret non-existent paths.
 
 * `location ~ \.php$ {}`
 
-Ce bloc redirige toutes les requêtes vers des fichiers PHP vers PHP-FPM (FastCGI), qui tourne dans un conteneur séparé (ici : `wordpress`). Il permet à Nginx de **déléguer l’exécution des scripts PHP** au bon service.
+This block redirects all requests for PHP files to PHP-FPM (FastCGI), which runs in a separate container (here: `wordpress`). It allows Nginx to **delegate the execution of PHP scripts** to the correct service.
 
-#### Le bloc `location ~ \.php$ {}` en détail
+#### The `location ~ \.php$ {}` block in detail
 
 
 ```
@@ -245,156 +246,156 @@ location ~ \.php$ {
 }
 ```
 
-Explication des directives :
+Explanation of the directives:
 
-* `fastcgi_split_path_info` Sépare le chemin du fichier PHP et le reste de l’URL.
-  Exemple : `/index.php/xyz` → fichier : `index.php`, path\_info : `/xyz`
+* `fastcgi_split_path_info` Splits the path of the PHP file and the rest of the URL.
+  Example: `/index.php/xyz` → file: `index.php`, path_info: `/xyz`
 
-* `fastcgi_pass` Indique où envoyer la requête : ici vers le conteneur `wordpress` sur le port `9000`, où tourne PHP-FPM.
+* `fastcgi_pass` Indicates where to send the request: here to the `wordpress` container on port `9000`, where PHP-FPM is running.
 
-* `fastcgi_index` Définit le fichier par défaut à exécuter si aucun fichier n’est précisé dans l’URL (ex : `/admin/` → `index.php`).
+* `fastcgi_index` Defines the default file to execute if no file is specified in the URL (e.g., `/admin/` → `index.php`).
 
-* `include fastcgi_params` Inclut un fichier standard contenant les variables d’environnement nécessaires à FastCGI (ex : `REQUEST_METHOD`, `SCRIPT_NAME`, etc.).
+* `include fastcgi_params` Includes a standard file containing the environment variables necessary for FastCGI (e.g., `REQUEST_METHOD`, `SCRIPT_NAME`, etc.).
 
-* `fastcgi_param SCRIPT_FILENAME` Spécifie le chemin complet du fichier PHP à exécuter, en combinant le `document_root` et le nom du fichier PHP demandé.
+* `fastcgi_param SCRIPT_FILENAME` Specifies the full path of the PHP file to be executed, by combining the `document_root` and the name of the requested PHP file.
 
-* `fastcgi_param PATH_INFO` Transmet à PHP la partie de l’URL située **après** le fichier `.php`, utile pour certains frameworks.
+* `fastcgi_param PATH_INFO` Transmits to PHP the part of the URL located **after** the `.php` file, useful for some frameworks.
 
-> Les directives `fastcgi_pass`, `include fastcgi_params`, et `fastcgi_param SCRIPT_FILENAME` sont **indispensables** pour exécuter du PHP avec Nginx. Les autres sont **fortement recommandées** pour une compatibilité maximale.
+> The `fastcgi_pass`, `include fastcgi_params`, and `fastcgi_param SCRIPT_FILENAME` directives are **essential** for running PHP with Nginx. The others are **strongly recommended** for maximum compatibility.
 
 
 ### DOCKERFILE
 
-Un `Dockerfile` est un fichier texte qui contient **l’ensemble des instructions nécessaires pour construire une image Docker**.
-Chaque instruction est lue ligne par ligne et exécutée dans l’ordre, pour créer une image qui servira de base à un conteneur.
+A `Dockerfile` is a text file that contains **all the instructions needed to build a Docker image**.
+Each instruction is read line by line and executed in order, to create an image that will serve as the basis for a container.
 
-Un `Dockerfile` peut contenir différentes directives, les plus courantes étant :
+A `Dockerfile` can contain different directives, the most common being:
 
 * `FROM`
-  Spécifie l’**image de base** sur laquelle construire. Cette image sera téléchargée depuis le Docker Hub
+  Specifies the **base image** on which to build. This image will be downloaded from Docker Hub.
   
 * `LABEL`
-  Ajoute des **informations descriptives** (métadonnées) à l’image, comme l’auteur ou une description.
+  Adds **descriptive information** (metadata) to the image, such as the author or a description.
 
 * `RUN`
-  Exécute une commande **au moment de la construction de l’image** (ex : installation de paquets). On peut enchaîner plusieurs commandes dans une même ligne `RUN` en les séparant par des `&&`, ce qui permet de créer une image noins lourde qu'une image créée à partir d 'un Dockefile contenant de multiples lignes `RUN`.
+  Executes a command **at the time of image construction** (e.g., installing packages). You can chain several commands in the same `RUN` line by separating them with `&&`, which allows creating a lighter image than one created from a Dockerfile containing multiple `RUN` lines.
 
 * `COPY`
-  Copie un fichier ou un dossier **depuis le contexte de build local** vers le système de fichiers de l’image (depuis la machine hôte ou la VM vers vers le conteneur).
-  Exemple :
+  Copies a file or folder **from the local build context** to the image's file system (from the host machine or VM to the container).
+  Example:
 
 * `EXPOSE`
-  Indique **le port sur lequel le conteneur écoutera** une fois lancé. C’est **informatif** (il ne publie pas le port automatiquement).
+  Indicates **the port on which the container will listen** once launched. This is **informative** (it does not publish the port automatically).
 
 * `CMD`
-  Définit la **commande par défaut** à exécuter quand le conteneur démarre.
+  Defines the **default command** to be executed when the container starts.
 
 * `ENTRYPOINT`
-  Très semblable à `CMD` mais définit un programme à exécuter au lieu d'une commande.
+  Very similar to `CMD` but defines a program to be executed instead of a command.
 
-Pour plus de lisibilité, on peut couper les longues lignes avec des retours à la ligne précédés du caractère `\`.
+For better readability, you can break long lines with line breaks preceded by the `\` character.
 
-Exemple :
+Example:
 
 ```dockerfile
 FROM nginx:alpine
-LABEL maintainer="votre_login@student.42.fr"
+LABEL maintainer="your_login@student.42.fr"
 COPY ./html /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
-### COMMANDES DE BASES POUR UTILISER UN DOCKERFILE
+### BASIC COMMANDS FOR USING A DOCKERFILE
 
-Voici les commandes les plus courantes :
+Here are the most common commands:
 
 * `docker build`
-  Sert à créer une image Docker à partir d’un Dockerfile.
+  Used to create a Docker image from a Dockerfile.
 
   ```bash
-  docker build -t nom_de_l_image .
+  docker build -t image_name .
   ```
 
-  * `-t` sert à donner un nom à l’image (exemple : `nginx42`)
-  * `.` indique le contexte de build : le dossier contenant le `Dockerfile` (il faut donc être dans le répertoire du Dockerfile pour exécuter cette commande)
+  * `-t` is used to give a name to the image (example: `nginx42`)
+  * `.` indicates the build context: the folder containing the `Dockerfile` (so you must be in the Dockerfile's directory to run this command)
 
 * `docker images`
-  Affiche la liste des images Docker disponibles localement.
+  Displays the list of locally available Docker images.
 
   ```bash
   docker images
   ```
   
 * `docker run`
-  Sert à lancer un conteneur à partir d’une image.
+  Used to launch a container from an image.
 
   ```bash
-  docker run -d -p 8080:80 --name mon_conteneur nom_de_l_image
+  docker run -d -p 8080:80 --name my_container image_name
   ```
 
-  * `-d` exécute le conteneur en arrière-plan (mode "détaché")
-  * `-p` publie le port du conteneur sur le port de la machine hôte (`hôte:conteneur`)
-  * `--name` donne un nom personnalisé au conteneur
+  * `-d` runs the container in the background ("detached" mode)
+  * `-p` publishes the container's port to the host machine's port (`host:container`)
+  * `--name` gives a custom name to the container
 
 * `docker ps`
-  Affiche les conteneurs en cours d’exécution.
+  Displays running containers.
 
   ```bash
   docker ps
   ```
   
 * `docker logs`
-  Affiche les logs d’un conteneur (utile si `access_log` est redirigé vers `stdout` dans Nginx).
+  Displays the logs of a container (useful if `access_log` is redirected to `stdout` in Nginx).
 
   ```bash
-  docker logs mon_conteneur
+  docker logs my_container
   ```
 
 * `docker stop`
-  Arrête un conteneur en cours d’exécution.
+  Stops a running container.
 
   ```bash
-  docker stop mon_conteneur
+  docker stop my_container
   ```
 
 * `docker rm`
-  Supprime un conteneur arrêté.
+  Removes a stopped container.
 
   ```bash
-  docker rm mon_conteneur
+  docker rm my_container
   ```
 
 * `docker rmi`
-  Supprime une image Docker.
+  Removes a Docker image.
 
   ```bash
-  docker rmi nom_de_l_image
+  docker rmi image_name
   ```
 
 * `docker system prune -a -f`
-  Supprime tout ce qui est inutilisé par Docker :
-  * conteneurs arrêtés
-  * volumes non utilisés (optionnel, voir plus bas)
-  * réseaux non utilisés
-  * images non utilisées par un conteneur actif
+  Removes everything unused by Docker:
+  * stopped containers
+  * unused volumes (optional, see below)
+  * unused networks
+  * images not used by an active container
 
 
   ```bash
   docker system prune -a -f
   ```
 
-  * `-a` (ou `--all`) supprime toutes les images non utilisées, même celles qui ne sont pas "dangling" (non taguées). Sans `-a`, seules les images "dangling" sont supprimées.
-  * `-f` force la suppression sans demander confirmation.
+  * `-a` (or `--all`) removes all unused images, even those that are not "dangling" (untagged). Without `-a`, only "dangling" images are removed.
+  * `-f` forces deletion without asking for confirmation.
 
 
-Parfait, voici une **explication rédigée pour ton README**, dans ton style, qui explique **pas à pas la logique** ayant conduit à l’écriture de ce `Dockerfile`. On garde le ton pédagogique et progressif, avec des retours aux concepts vus précédemment.
+Perfect, here is an **explanation written for your README**, in your style, which explains **step by step the logic** that led to the writing of this `Dockerfile`. We keep the pedagogical and progressive tone, with references to concepts seen previously.
 
 
-### CONSTRUCTION DU DOCKERFILE NGINX
+### BUILDING THE NGINX DOCKERFILE
 
-Maintenant que l’on a vu les principales directives d’un `Dockerfile`, on peut comprendre étape par étape la construction de l’image Nginx pour le projet Inception.
+Now that we have seen the main directives of a `Dockerfile`, we can understand step by step the construction of the Nginx image for the Inception project.
 
-Voici le fichier utilisé :
+Here is the file used:
 
 ```dockerfile
 FROM debian:11.11
@@ -419,41 +420,41 @@ CMD ["nginx", "-g", "daemon off;"]
 
 #### *`FROM debian:11.11`*
 
-On part d’une image Debian minimale (`11.11`). On aurait aussi pu utiliser `bookworm`, mais ici on utilise une version précise pour éviter les différences futures.
+We start from a minimal Debian image (`11.11`). We could also have used `bookworm`, but here we use a specific version to avoid future differences.
 
 #### *`RUN ...`*
 
-Cette instruction enchaîne plusieurs commandes dans une seule ligne, séparées par `&&`, pour des raisons de lisibilité et d’optimisation (éviter des couches inutiles dans l’image).
+This instruction chains several commands in a single line, separated by `&&`, for readability and optimization reasons (to avoid unnecessary layers in the image).
 
-Voici ce que fait chaque partie :
+Here is what each part does:
 
 * `apt-get update`
-  Met à jour la liste des paquets disponibles.
+  Updates the list of available packages.
 
 * `apt-get install -y nginx curl openssl procps`
-  Installe :
+  Installs:
 
-  * `nginx` : le serveur web
-  * `curl` : outil de test HTTP (optionnel mais utile)
-  * `openssl` : pour générer un certificat SSL auto-signé
-  * `procps` : pour des outils comme `ps` (optionnel mais utile en debug)
+  * `nginx`: the web server
+  * `curl`: HTTP testing tool (optional but useful)
+  * `openssl`: to generate a self-signed SSL certificate
+  * `procps`: for tools like `ps` (optional but useful for debugging)
 
 * `apt-get clean && rm -rf /var/lib/apt/lists/*`
-  Nettoie les fichiers inutiles après installation pour réduire la taille de l’image.
+  Cleans up unnecessary files after installation to reduce the image size.
 
-* `mkdir -p /etc/ssl/certs` et `/etc/ssl/private`
-  Crée les dossiers qui vont contenir le certificat SSL et la clé privée.
+* `mkdir -p /etc/ssl/certs` and `/etc/ssl/private`
+  Creates the folders that will contain the SSL certificate and the private key.
 
 * `openssl req -x509 ...`
-  Génère un **certificat SSL auto-signé**, valable un an (`365 jours`).
-  Ce certificat sera utilisé par Nginx pour activer le **HTTPS**.
+  Generates a **self-signed SSL certificate**, valid for one year (`365 days`).
+  This certificate will be used by Nginx to enable **HTTPS**.
 
-> Génération d’un certificat SSL auto-signé avec `openssl`
+> Generating a self-signed SSL certificate with `openssl`
 >
-> Dans le projet Inception, on a besoin d’un certificat SSL pour activer le HTTPS dans Nginx.
-> Plutôt que d’utiliser un certificat signé par une autorité (comme Let's Encrypt), on génère un **certificat auto-signé** lors de la construction du conteneur.
+> In the Inception project, we need an SSL certificate to enable HTTPS in Nginx.
+> Rather than using a certificate signed by an authority (like Let's Encrypt), we generate a **self-signed certificate** during the container build.
 >
-> La commande suivante est utilisée dans le `Dockerfile` :
+> The following command is used in the `Dockerfile`:
 >
 > ```dockerfile
 > openssl req -x509 -nodes -days 365 \
@@ -462,15 +463,15 @@ Voici ce que fait chaque partie :
 >   -subj "/C=FR/ST=Occitanie/L=Perpignan/O=42/OU=42/CN=chdonnat.42.fr"
 > ```
 >
-> Cette commande permet de :
+> This command allows to:
 >
-> * Générer un **certificat auto-signé** (`-x509`) sans passer par une autorité externe
-> * **Ne pas chiffrer** la clé privée (`-nodes`) — indispensable en Docker, pour éviter toute saisie de mot de passe
-> * Définir une **durée de validité** de 365 jours (`-days 365`)
-> * Spécifier les chemins de sortie du certificat et de la clé (`-out`, `-keyout`)
-> * Fournir toutes les **informations d’identité** directement en ligne avec l’option `-subj`
+> * Generate a **self-signed certificate** (`-x509`) without going through an external authority
+> * **Not encrypt** the private key (`-nodes`) — essential in Docker, to avoid any password entry
+> * Define a **validity period** of 365 days (`-days 365`)
+> * Specify the output paths for the certificate and the key (`-out`, `-keyout`)
+> * Provide all **identity information** directly online with the `-subj` option
 >
-> Ce certificat et sa clé sont ensuite utilisés dans la configuration Nginx pour activer HTTPS :
+> This certificate and its key are then used in the Nginx configuration to enable HTTPS:
 >
 > ```nginx
 > ssl_certificate     /etc/ssl/certs/nginx.crt;
@@ -478,96 +479,96 @@ Voici ce que fait chaque partie :
 > ```
 
 * `mkdir -p /var/run/nginx`
-  Crée le dossier nécessaire pour que Nginx puisse écrire son PID. Nginx a besoin d’un endroit pour stocker son fichier PID (Process ID) lorsqu’il démarre. Par défaut, ce fichier est : `/var/run/nginx.pid`. Mais le fichier ne peut être créé que si le répertoire, or ce dossier n'existe pas forcément par défaut (comme dans un conteneur Debian minimal). Si le dossier n’existe pas et que Nginx essaie d’y écrire, le serveur échouera au démarrage.
+  Creates the necessary folder for Nginx to write its PID. Nginx needs a place to store its PID (Process ID) file when it starts. By default, this file is: `/var/run/nginx.pid`. But the file can only be created if the directory exists, and this folder does not necessarily exist by default (as in a minimal Debian container). If the folder does not exist and Nginx tries to write to it, the server will fail to start.
 
-* `mkdir -p /var/www/wordpress` et `/var/www/html`
-  Crée les répertoires où seront stockés les fichiers du site WordPress et éventuellement une page statique d’accueil (pour faire des test par exemple).
-  Ces dossiers correspondent aussi aux **volumes partagés** entre Nginx et d'autres conteneurs (comme WordPress).
+* `mkdir -p /var/www/wordpress` and `/var/www/html`
+  Creates the directories where the WordPress site files and possibly a static welcome page will be stored (for testing, for example).
+  These folders also correspond to the **shared volumes** between Nginx and other containers (like WordPress).
 
 #### *`COPY`*
 
 * `COPY conf/nginx.conf /etc/nginx/nginx.conf`
-  Copie le fichier de configuration Nginx personnalisé dans l’image, à l’endroit attendu par Nginx.
+  Copies the custom Nginx configuration file into the image, at the location expected by Nginx.
 
 * `COPY conf/index.html /var/www/html/index.html`
-  Copie une page d’accueil statique par défaut (utile pour tester que le serveur fonctionne même sans WordPress).
+  Copies a default static home page (useful for testing that the server works even without WordPress).
 
 
 #### *`EXPOSE 443`*
 
-Indique que le serveur écoute sur le **port HTTPS** (443). Cela ne publie pas le port tout seul, mais **documente** que ce conteneur est conçu pour recevoir des connexions SSL.
+Indicates that the server is listening on the **HTTPS port** (443). This does not publish the port by itself, but **documents** that this container is designed to receive SSL connections.
 
 #### *`CMD ["nginx", "-g", "daemon off;"]`*
 
-Démarre Nginx en mode **non-daemonisé**, ce qui est indispensable dans un conteneur Docker (sinon le processus principal quitte immédiatement et le conteneur s’arrête).
+Starts Nginx in **non-daemonized** mode, which is essential in a Docker container (otherwise the main process exits immediately and the container stops).
 
-> Pourquoi utiliser `daemon off;` avec Nginx dans Docker ?
+> Why use `daemon off;` with Nginx in Docker?
 > 
-> Quand on exécute un conteneur Docker, il attend qu’un processus principal s’exécute en "PID 1".
-> Ce processus devient le "processus maître" du conteneur.
-> Si ce processus se termine, le conteneur s’arrête immédiatement.
+> When you run a Docker container, it waits for a main process to run as "PID 1".
+> This process becomes the "master process" of the container.
+> If this process terminates, the container stops immediately.
 >
-> Le PID 1 dans un conteneur joue un rôle spécial :
-> * Il est le parent de tous les autres processus.
-> * Il doit rester actif tant que le conteneur tourne.
-> * Il doit capturer les signaux (comme SIGTERM) pour permettre un arrêt propre.
+> The PID 1 in a container plays a special role:
+> * It is the parent of all other processes.
+> * It must remain active as long as the container is running.
+> * It must capture signals (like SIGTERM) to allow a clean shutdown.
 >
-> Si le processus PID 1 se termine (ou entre en arrière-plan), Docker considère que le conteneur est fini, et l’arrête.
+> If the PID 1 process terminates (or goes into the background), Docker considers the container finished, and stops it.
 >
-> L’option `-g` permet de passer une directive de configuration globale directement en ligne de commande, sans modifier le fichier `nginx.conf`.
+> The `-g` option allows passing a global configuration directive directly on the command line, without modifying the `nginx.conf` file.
 >
-> `daemon off;` permet de désactiver le mode daemon (arrière-plan) pour que Nginx reste au premier plan en tant que processus principal (PID 1) du conteneur.
+> `daemon off;` disables daemon mode (background) so that Nginx remains in the foreground as the main process (PID 1) of the container.
 
 
 ---
 
 
-## DOCKER MARIADB
+## MARIADB DOCKER
 
-MariaDB est un système de gestion de base de données relationnelle (SGBDR), compatible avec MySQL.
-Il est utilisé par WordPress pour stocker toutes les données dynamiques du site : utilisateurs, articles, paramètres, commentaires, etc.
-
-
-Dans le projet Inception, MariaDB fonctionne comme un service autonome (dans son propre conteneur) auquel WordPress se connecte via un nom d’hôte (mariadb) et un ensemble d’identifiants (base de données, nom d’utilisateur, mot de passe).
+MariaDB is a relational database management system (RDBMS), compatible with MySQL.
+It is used by WordPress to store all the dynamic data of the site: users, posts, settings, comments, etc.
 
 
-Pour realiser le docker MariaDB , il faut d abord creer un fichier de configuration pour MariaDB, puis un Dockerfile qui creera le docker a partir d une image Debian ou Alpine, et enfin un script d'initialisation.
-
-### FICHIER DE CONFIGURATION MARIADB
-
-Le fichier de configuration de MariaDB permet de définir les paramètres du serveur de base de données au démarrage : ports, noms de fichiers de log, limites de connexions, emplacements des bases, encodage, etc.
+In the Inception project, MariaDB functions as a standalone service (in its own container) to which WordPress connects via a hostname (mariadb) and a set of credentials (database, username, password).
 
 
-Dans le cadre d’Inception, ce fichier est généralement peu modifié. On se contente le plus souvent de créer un fichier SQL d’initialisation (exécuté au premier lancement) pour créer la base, l’utilisateur, et définir ses droits.
+To create the MariaDB docker, you must first create a configuration file for MariaDB, then a Dockerfile that will create the docker from a Debian or Alpine image, and finally an initialization script.
 
-#### Comment le nommer et où le placer
+### MARIADB CONFIGURATION FILE
 
-MariaDB lit sa configuration à partir de plusieurs fichiers, dans un ordre bien défini. Le fichier principal est généralement situé à `/etc/mysql/my.cnf`.
-Mais il inclut aussi automatiquement **tous les fichiers se terminant par `.cnf`** présents dans le dossier `/etc/mysql/conf.d/`.
+The MariaDB configuration file allows you to define the database server parameters at startup: ports, log file names, connection limits, database locations, encoding, etc.
 
-C’est pourquoi, dans le projet Inception, on peut nommer le fichier de configuration : `50-server.cnf`.
-Ce nom suit une **convention d’ordre alphabétique** pour garantir que le fichier soit lu **après les fichiers par défaut**, sans avoir à modifier le fichier `my.cnf` principal.
 
-Il faudra s'assurer que le Dockerfile copie le fichier de configuration dans le conteneur MariaDB dans le dossier `/etc/mysql/conf.d/50-server.cnf`.
+In the context of Inception, this file is generally little modified. We usually just create an SQL initialization file (executed on first launch) to create the database, the user, and define their rights.
 
-> Le nom `50-server.cnf` est recommandé car il est explicite, respecte les conventions, et permet de modifier uniquement ce qui est nécessaire sans toucher aux fichiers système.
+#### How to name it and where to place it
 
-#### Contenu d'un fichier de configuration `50-server.cnf`
+MariaDB reads its configuration from several files, in a well-defined order. The main file is usually located at `/etc/mysql/my.cnf`.
+But it also automatically includes **all files ending in `.cnf`** present in the `/etc/mysql/conf.d/` folder.
 
-Un fichier de configuration MariaDB est structuré en deux parties :
+This is why, in the Inception project, we can name the configuration file: `50-server.cnf`.
+This name follows an **alphabetical order convention** to ensure that the file is read **after the default files**, without having to modify the main `my.cnf` file.
 
-* **Des blocs (ou sections)**
-  Chaque bloc est indiqué entre crochets, comme `[mysqld]` ou `[client]`.
-  Chaque bloc s’applique à une partie spécifique de l’écosystème MariaDB :
+You will need to ensure that the Dockerfile copies the configuration file into the MariaDB container in the `/etc/mysql/conf.d/50-server.cnf` folder.
 
-  * `[mysqld]` : options pour le serveur MariaDB lui-même
-  * `[mysql]` : options pour le client `mysql` (l’interface en ligne de commande)
-  * `[client]` : options pour tous les clients (y compris `mysqldump`, `mysqladmin`, etc.)
+> The name `50-server.cnf` is recommended because it is explicit, respects conventions, and allows you to modify only what is necessary without touching the system files.
 
-* **Des directives**
-  À l’intérieur de chaque bloc, on écrit des lignes sous la forme `clé = valeur` pour définir les paramètres à appliquer.
+#### Content of a `50-server.cnf` configuration file
 
-#### Exemple de structure utilisée dans Inception :
+A MariaDB configuration file is structured in two parts:
+
+* **Blocks (or sections)**
+  Each block is indicated in square brackets, like `[mysqld]` or `[client]`.
+  Each block applies to a specific part of the MariaDB ecosystem:
+
+  * `[mysqld]`: options for the MariaDB server itself
+  * `[mysql]`: options for the `mysql` client (the command-line interface)
+  * `[client]`: options for all clients (including `mysqldump`, `mysqladmin`, etc.)
+
+* **Directives**
+  Inside each block, we write lines in the form `key = value` to define the parameters to be applied.
+
+#### Example of structure used in Inception:
 
 ```ini
 [mysqld]
@@ -578,54 +579,54 @@ port = 3306
 user = mysql
 ```
 
-> Le bloc `[mysqld]` est le seul obligatoire dans le contexte du projet Inception, car c’est lui qui configure le **comportement du serveur MariaDB** au démarrage.
-> Les blocs `[client]` et `[mysql]` sont facultatifs, mais utiles si on veut interagir avec la base en ligne de commande depuis l’intérieur du conteneur.
+> The `[mysqld]` block is the only mandatory one in the context of the Inception project, as it is the one that configures the **behavior of the MariaDB server** at startup.
+> The `[client]` and `[mysql]` blocks are optional, but useful if you want to interact with the database from the command line inside the container.
 
-#### Explication des directives
+#### Explanation of the directives
 
 * `datadir = /var/lib/mysql`
-  Spécifie le répertoire où sont stockées les **données des bases**.
-  C’est aussi là que sera monté le volume Docker pour persister les données.
-  *-> Voir le paragraphe sur les volumes plus loin.*
+  Specifies the directory where the **database data** is stored.
+  This is also where the Docker volume will be mounted to persist the data.
+  *-> See the paragraph on volumes below.*
 
 * `socket = /run/mysqld/mysqld.sock`
-  Définit le chemin du **fichier socket UNIX** utilisé pour les connexions locales (utile pour des outils comme `mysql` en ligne de commande dans le conteneur).
+  Defines the path of the **UNIX socket file** used for local connections (useful for tools like `mysql` on the command line in the container).
 
 * `bind_address = 0.0.0.0`
-  Permet à MariaDB d'écouter sur **toutes les interfaces réseau** du conteneur.
-  ➤ Cela permet à **WordPress (dans un autre conteneur)** de s’y connecter.
+  Allows MariaDB to listen on **all network interfaces** of the container.
+  ➤ This allows **WordPress (in another container)** to connect to it.
 
 * `port = 3306`
-  Définit le port utilisé par MariaDB (3306 est le port standard).
+  Defines the port used by MariaDB (3306 is the standard port).
 
 * `user = mysql`
-  Indique l’utilisateur système Linux sous lequel MariaDB s’exécute.
-  Par défaut dans Docker, l’utilisateur `mysql` est déjà configuré.
+  Indicates the Linux system user under which MariaDB runs.
+  By default in Docker, the `mysql` user is already configured.
 
-### DOCKERFILE MARIADB
+### MARIADB DOCKERFILE
 
-Pour le Dockerfile de MariaDB, nous pouvons garder les choses simples. Il faut utiliser une image `debian` ou `alpine` comme l'exige le sujet, installer `mariadb-server`, copier le fichier de configuration réalisé précedemment dans le docker, exposer le port 3306 comme exigé dans le sujet.
+For the MariaDB Dockerfile, we can keep things simple. We must use a `debian` or `alpine` image as required by the subject, install `mariadb-server`, copy the previously created configuration file into the docker, expose port 3306 as required in the subject.
 
-Toutefois, lorsque MariaDB démarre pour la première fois, il initialise un répertoire de données vide (`/var/lib/mysql`) et configure la base de données système.
-À ce moment-là, si aucun mot de passe ou configuration n’est défini, aucune base ni utilisateur personnalisé n’existe encore, et l’accès root peut être sans mot de passe – ce qui est dangereux en production.
-C’est pourquoi, dans un déploiement automatisé (comme dans un conteneur Docker), il est essentiel de fournir dès le départ des variables suivantes pour :
+However, when MariaDB starts for the first time, it initializes an empty data directory (`/var/lib/mysql`) and configures the system database.
+At this point, if no password or configuration is set, no custom database or user exists yet, and root access may be passwordless – which is dangerous in production.
+This is why, in an automated deployment (as in a Docker container), it is essential to provide the following variables from the start to:
 
-* Créer une base de données personnalisée
-  `DB_NAME` : permet d’indiquer à MariaDB quelle base créer automatiquement (ex. wordpress)
-  Sans cette variable, il faudrait le faire manuellement après lancement
+* Create a custom database
+  `DB_NAME`: allows you to tell MariaDB which database to create automatically (e.g. wordpress)
+  Without this variable, it would have to be done manually after launch
 
-* Créer un utilisateur avec mot de passe
-  `DB_USER` et `DB_USER_PASS` : permettent de créer un utilisateur dédié
-  pour se connecter à la base sans utiliser le compte `root`
-  **Bonnes pratiques de sécurité :** chaque application (ex. WordPress) doit avoir son propre utilisateur
+* Create a user with a password
+  `DB_USER` and `DB_USER_PASS`: allow you to create a dedicated user
+  to connect to the database without using the `root` account
+  **Good security practice:** each application (e.g. WordPress) must have its own user
 
-* Protéger le compte root
-  `DB_ROOT_PASS` : fixe un mot de passe sécurisé pour l’utilisateur root de MariaDB
-  Sans cela, root pourrait ne pas avoir de mot de passe, ce qui pose un risque critique
+* Protect the root account
+  `DB_ROOT_PASS`: sets a secure password for the MariaDB root user
+  Without this, root might not have a password, which poses a critical risk
 
-Nous allons donc devoir créer un script (`entrypoint.sh` que nous enregistrerons dans le répertoire `tools`) à exécuter au lancement du conteneur MariaDB afin de configurer tout cela (exactement comme si nous tappions des commandes dans le conteneur après son lancement).
+We will therefore have to create a script (`entrypoint.sh` which we will save in the `tools` directory) to be executed when the MariaDB container is launched in order to configure all this (exactly as if we were typing commands in the container after its launch).
 
-Le Dockerfile va donc aussi devoir copier ce script dans de conteneur, donner les droits d'exécutions à ce script, puis exécuter le script.
+The Dockerfile will therefore also have to copy this script into the container, give execution rights to this script, then execute the script.
 
 ```Dockerfile
 FROM debian:11.11
@@ -639,39 +640,39 @@ EXPOSE 3306
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 ```
 
->  Pourquoi ENTRYPOINT et pas CMD ?
-> Parce que ENTRYPOINT permet de remplacer le processus principal du conteneur (PID 1) par un script ou programme, ce qui est idéal pour exécuter notre script d’initialisation.
+>  Why ENTRYPOINT and not CMD?
+> Because ENTRYPOINT allows replacing the main process of the container (PID 1) with a script or program, which is ideal for running our initialization script.
 
-### DOCKER ET LES VARIABLES D'ENVIRONNEMENT
+### DOCKER AND ENVIRONMENT VARIABLES
 
-#### Passer des variables d’environnement à un conteneur Docker
+#### Passing environment variables to a Docker container
 
-Les **variables d’environnement** permettent de transmettre des informations dynamiques à un conteneur, comme des identifiants, un mot de passe, ou un nom de base de données.
-Il existe plusieurs manières de les définir, selon l’outil utilisé.
+**Environment variables** allow you to pass dynamic information to a container, such as credentials, a password, or a database name.
+There are several ways to define them, depending on the tool used.
 
-#### En ligne de commande avec `docker run -e`
+#### On the command line with `docker run -e`
 
-Lorsqu’on utilise `docker run` directement (sans `docker-compose`), il est possible de passer les variables une par une avec l'option `-e` :
+When using `docker run` directly (without `docker-compose`), it is possible to pass the variables one by one with the `-e` option:
 
 ```bash
 docker run -e DB_NAME=wordpress \
            -e DB_USER=wp_user \
            -e DB_USER_PASS=wp_pass \
            -e DB_ROOT_PASS=rootpass \
-           nom_de_l_image
+           image_name
 ```
 
-#### Avec un fichier `.env` et `docker run --env-file`
+#### With a `.env` file and `docker run --env-file`
 
-Les variables peuvent également être stockées dans un fichier `.env` et injectées au conteneur via l’option `--env-file` :
+The variables can also be stored in a `.env` file and injected into the container via the `--env-file` option:
 
 ```bash
-docker run --env-file .env nom_de_l_image
+docker run --env-file .env image_name
 ```
 
-#### Avec l’instruction `ENV` dans le `Dockerfile`
+#### With the `ENV` instruction in the `Dockerfile`
 
-Il est aussi possible de définir des variables directement dans le `Dockerfile` :
+It is also possible to define variables directly in the `Dockerfile`:
 
 ```dockerfile
 ENV DB_NAME=wordpress
@@ -680,13 +681,13 @@ ENV DB_USER_PASS=wp_pass
 ENV DB_ROOT_PASS=rootpass
 ```
 
-Cependant, cette méthode rend les valeurs **statiques et figées dans l’image**. Il faut reconstruire l’image si l’on souhaite modifier une valeur.
+However, this method makes the values **static and fixed in the image**. The image must be rebuilt if you want to modify a value.
 
-#### Avec `docker-compose.yml` (recommandé dans Inception)
+#### With `docker-compose.yml` (recommended in Inception)
 
-> Un fichier docker-compose.yml est un fichier de configuration au format YAML qui permet de définir, configurer et lancer plusieurs conteneurs Docker en une seule commande (docker-compose up).
+> A docker-compose.yml file is a configuration file in YAML format that allows you to define, configure and launch several Docker containers in a single command (docker-compose up).
 
-Une manière simple et lisible consiste à déclarer les variables directement dans la section `environment` du fichier `docker-compose.yml` (*-> voir plus loin pour la réalisation d'un fichier `docker-compose.yml`*) :
+A simple and readable way is to declare the variables directly in the `environment` section of the `docker-compose.yml` file (*-> see below for the creation of a `docker-compose.yml` file*):
 
 ```yaml
 services:
@@ -699,11 +700,11 @@ services:
       DB_ROOT_PASS: rootpass
 ```
 
-Ces variables seront injectées dans le conteneur **au moment de son exécution** et pourront être utilisées dans des scripts comme `entrypoint.sh`.
+These variables will be injected into the container **at the time of its execution** and can be used in scripts like `entrypoint.sh`.
 
-#### Avec un fichier `.env` et `docker-compose.tml`
+#### With a `.env` file and `docker-compose.yml`
 
-Il est également possible de stocker les variables dans un fichier `.env` situé à la racine du projet :
+It is also possible to store the variables in a `.env` file located at the root of the project:
 
 ```env
 DB_NAME=wordpress
@@ -712,8 +713,8 @@ DB_USER_PASS=wp_pass
 DB_ROOT_PASS=rootpass
 ```
 
-Par défaut, `docker-compose` lit automatiquement ce fichier `.env` **s’il se trouve dans le même dossier que le `docker-compose.yml`**.
-Il est alors possible de référencer ces variables dans `docker-compose.yml` :
+By default, `docker-compose` automatically reads this `.env` file **if it is in the same folder as the `docker-compose.yml`**.
+It is then possible to reference these variables in `docker-compose.yml`:
 
 ```yaml
 services:
@@ -726,28 +727,28 @@ services:
       DB_ROOT_PASS: ${DB_ROOT_PASS}
 ```
 
-#### Recommandation (projet Inception)
+#### Recommendation (Inception project)
 
-> Dans le cadre du projet **Inception**, il est **recommandé d’utiliser le fichier `docker-compose.yml` avec des variables définies directement dans un fichier `.env`**.
+> In the context of the **Inception** project, it is **recommended to use the `docker-compose.yml` file with variables defined directly in a `.env` file**.
 
 
-### SCRIPT POUR CONFIGURER MARIADB
+### SCRIPT TO CONFIGURE MARIADB
 
-Voici le script utilisé (placé dans le répertoire `tools` du répertoire `mariadb`).
-Ce script est exécuté automatiquement au démarrage du conteneur MariaDB.
-Il initialise la base de données, crée l’utilisateur, la base de donnée `wordpress`, et applique les bonnes permissions à partir des **variables d’environnement** fournies.
+Here is the script used (placed in the `tools` directory of the `mariadb` directory).
+This script is executed automatically when the MariaDB container starts.
+It initializes the database, creates the user, the `wordpress` database, and applies the correct permissions from the provided **environment variables**.
 
-#### Contenu du script
+#### Script content
 
 ```bash
 #!/bin/bash
 
 set -e
 
-: "${MDB_NAME:?Variable d'environnement MDB_NAME manquante}"
-: "${MDB_USER:?Variable d'environnement MDB_USER manquante}"
-: "${MDB_USER_PASS:?Variable d'environnement MDB_USER_PASS manquante}"
-: "${MDB_ROOT_PASS:?Variable d'environnement MDB_ROOT_PASS manquante}"
+: "${MDB_NAME:?MDB_NAME environment variable missing}"
+: "${MDB_USER:?MDB_USER environment variable missing}"
+: "${MDB_USER_PASS:?MDB_USER_PASS environment variable missing}"
+: "${MDB_ROOT_PASS:?MDB_ROOT_PASS environment variable missing}"
 
 mkdir -p /run/mysqld
 chown -R mysql:mysql /run/mysqld
@@ -784,28 +785,28 @@ echo "✅ MariaDB starts..."
 exec mysqld_safe
 ```
 
-#### Explication du script
+#### Script explanation
 
-* `#!/bin/bash` : indique que le script doit être interprété par Bash.
-* `set -e` : le script s'arrête immédiatement si une commande échoue. Cela évite d’exécuter la suite du script avec une base mal configurée.
+* `#!/bin/bash`: indicates that the script should be interpreted by Bash.
+* `set -e`: the script stops immediately if a command fails. This avoids executing the rest of the script with a badly configured database.
 
 ```bash
-: "${MDB_NAME:?Variable d'environnement MDB_NAME manquante}"
-: "${MDB_USER:?Variable d'environnement MDB_USER manquante}"
-: "${MDB_USER_PASS:?Variable d'environnement MDB_USER_PASS manquante}"
-: "${MDB_ROOT_PASS:?Variable d'environnement MDB_ROOT_PASS manquante}"
+: "${MDB_NAME:?MDB_NAME environment variable missing}"
+: "${MDB_USER:?MDB_USER environment variable missing}"
+: "${MDB_USER_PASS:?MDB_USER_PASS environment variable missing}"
+: "${MDB_ROOT_PASS:?MDB_ROOT_PASS environment variable missing}"
 ```
 
-* Vérifie que les **quatre variables d’environnement** sont bien définies (pas obligatoire mais bonne pratique).
-* Si l'une d'elles est absente, le conteneur **échoue immédiatement** au démarrage avec un message clair.
+* Checks that the **four environment variables** are well defined (not mandatory but good practice).
+* If one of them is missing, the container **fails immediately** on startup with a clear message.
 
 ```bash
 mkdir -p /run/mysqld
 chown -R mysql:mysql /run/mysqld
 ```
 
-* Crée le dossier `/run/mysqld` si nécessaire (utilisé pour le fichier socket Unix, un fichier spécial qui permet à un client de se connecter).
-* Change le propriétaire pour l’utilisateur `mysql`, comme requis par MariaDB.
+* Creates the `/run/mysqld` folder if necessary (used for the Unix socket file, a special file that allows a client to connect).
+* Changes the owner to the `mysql` user, as required by MariaDB.
 
 ```bash
 if [ ! -d /var/lib/mysql/mysql ]; then
@@ -813,30 +814,30 @@ if [ ! -d /var/lib/mysql/mysql ]; then
 fi
 ```
 
-* Teste si la base système (`mysql`) existe.
-* Si ce n’est **pas le cas** (premier démarrage), elle est initialisée avec `mariadb-install-db`.
+* Tests if the system database (`mysql`) exists.
+* If this is **not the case** (first start), it is initialized with `mariadb-install-db`.
 
 ```bash
 mysqld_safe --skip-networking &
 ```
 
-* Démarre MariaDB **en arrière-plan**, sans ouvrir le port réseau.
-* Le symbole `&` en bash (et en shell en général) lance la commande en arrière-plan.
-* Le mode `--skip-networking` garantit qu’aucune connexion externe n'est possible durant l'init (ela empêche un client malveillant ou mal configuré d’envoyer une requête avant que la base ne soit prête).
+* Starts MariaDB **in the background**, without opening the network port.
+* The `&` symbol in bash (and in shell in general) launches the command in the background.
+* The `--skip-networking` mode ensures that no external connection is possible during initialization (this prevents a malicious or misconfigured client from sending a request before the database is ready).
 
->  `mysqld_safe` vs `mysqld` : quelles différences ?
+>  `mysqld_safe` vs `mysqld`: what are the differences?
 > 
-> `mysqld` est le vrai binaire du serveur MariaDB (daemon)
-> Il gère : Les connexions client, les requêtes SQL, les fichiers de données.
+> `mysqld` is the real binary of the MariaDB server (daemon)
+> It manages: Client connections, SQL queries, data files.
 >
-> `mysqld_safe` est un wrapper sûr autour de mysqld
-> C’est un script Bash (souvent dans /usr/bin/mysqld_safe).
-> Il sert à :
-> préparer le répertoire socket (/run/mysqld)appliquer les bons droits utilisateur,
-> lire les fichiers de config (/etc/my.cnf, /etc/mysql/my.cnf),
-> lancer mysqld avec les bons arguments,
-> relancer automatiquement mysqld s’il plante,
-> rediriger les logs correctement vers stderr/stdout.
+> `mysqld_safe` is a safe wrapper around mysqld
+> It is a Bash script (often in /usr/bin/mysqld_safe).
+> It is used to:
+> prepare the socket directory (/run/mysqld)apply the correct user rights,
+> read the config files (/etc/my.cnf, /etc/mysql/my.cnf),
+> launch mysqld with the correct arguments,
+> automatically restart mysqld if it crashes,
+> redirect logs correctly to stderr/stdout.
 
 ```bash
 for i in {30..0}; do
@@ -852,11 +853,11 @@ if [ "$i" = 0 ]; then
 fi
 ```
 
-* Attend que MariaDB soit **opérationnel** (ping OK).
-* `mysqladmin` est est un outil en ligne de commande fourni avec MariaDB/MySQL qui sert à administrer un serveur de base de données (le démarrer, l'arrêter, vérifier son état, etc.).
-* `mysqladmin ping` n'a rien à voir avec le ping réseau: Le ping ici tente de se connecter au serveur MariaDB via le socket, envoie une requête légère, attends une réponse (qu'on envoie dans `&>/dev/null` pour ne pas l'afficher), renvoie un code de sortie (0 si OK, 1 si échec).
-* Timeout de 30 secondes.
-* Affiche une erreur et quitte si le serveur ne répond pas.
+* Waits for MariaDB to be **operational** (ping OK).
+* `mysqladmin` is a command-line tool provided with MariaDB/MySQL that is used to administer a database server (start it, stop it, check its status, etc.).
+* `mysqladmin ping` has nothing to do with network ping: The ping here tries to connect to the MariaDB server via the socket, sends a light request, waits for a response (which we send to `&>/dev/null` so as not to display it), returns an exit code (0 if OK, 1 if failure).
+* 30-second timeout.
+* Displays an error and exits if the server does not respond.
 
 ```bash
 mariadb -u root -p"${MDB_ROOT_PASS}" -e "CREATE DATABASE IF NOT EXISTS \`${MDB_NAME}\`;"
@@ -866,47 +867,47 @@ mariadb -u root -p"${MDB_ROOT_PASS}" -e "ALTER USER 'root'@'localhost' IDENTIFIE
 mariadb -u root -p"${MDB_ROOT_PASS}" -e "FLUSH PRIVILEGES;"
 ```
 
-* Crée la base de données si elle n’existe pas.
-* Crée un utilisateur avec mot de passe et accès total à cette base.
-* Définit le mot de passe root (si absent au départ).
-* Applique les privilèges avec `FLUSH PRIVILEGES`.
+* Creates the database if it does not exist.
+* Creates a user with a password and full access to this database.
+* Sets the root password (if absent at the start).
+* Applies the privileges with `FLUSH PRIVILEGES`.
 
-* `mariadb` est le **client en ligne de commande** de MariaDB
-* `-u` spécifie l'utilisateur
-* `-p` spécifie le mot de passe (attention: pas d'espace entre -p et le mot de passe)
-* `-e` signifie : exécute cette commande SQL et quitte le shell MariaDB interactif (mode non interactif).
-* par convention, les commandes MariaDB sont en majuscule (mais ça fonctionne sans)
+* `mariadb` is the **command-line client** of MariaDB
+* `-u` specifies the user
+* `-p` specifies the password (note: no space between -p and the password)
+* `-e` means: execute this SQL command and exit the interactive MariaDB shell (non-interactive mode).
+* by convention, MariaDB commands are in uppercase (but it works without)
 
 
 ```bash
 mysqladmin -u root -p"${MDB_ROOT_PASS}" shutdown
 ```
 
-* Cette commande arrête proprement le serveur MariaDB lancé temporairement en arrière-plan pendant la phase de configuration initiale.
+* This command cleanly stops the MariaDB server temporarily launched in the background during the initial configuration phase.
 
 ```bash
 echo "✅ MariaDB starts..."
 exec mysqld_safe
 ```
 
-* Lance `mysqld_safe` **en mode foreground** avec `exec` : exec remplace le processus courant (ici : le script shell) par le processus mysqld_safe, sans créer un nouveau processus enfant (ce qui le remplace comme **PID 1**).
-* Il prend la place du script.
-* Permet au conteneur de rester actif tant que MariaDB tourne.
+* Launches `mysqld_safe` **in foreground mode** with `exec`: exec replaces the current process (here: the shell script) with the mysqld_safe process, without creating a new child process (which replaces it as **PID 1**).
+* It takes the place of the script.
+* Allows the container to remain active as long as MariaDB is running.
 
-### TESTER LE CONTENEUR MARIADB
+### TESTING THE MARIADB CONTAINER
 
-A ce stade, il est possible de tester le conteneur MariaDB.
-Pour cela, il faut se placer dans le répertoire contenant le `Dockerfile` et tapper les commandes suivantes :
+At this stage, it is possible to test the MariaDB container.
+To do this, you must go to the directory containing the `Dockerfile` and type the following commands:
 
-#### construire l'image :
+#### build the image:
 
 ```bash
 docker build -t mariadb .
 ```
 
-- `-t` sert à donner un nom à l'image
+- `-t` is used to give a name to the image
 
-#### lancer le docker :
+#### launch the docker:
 
 ```bash
 docker run -d \
@@ -918,45 +919,45 @@ docker run -d \
   mariadb
 ```
 
-- `-d` lance en arrière-plan (détaché)
-- `--name` donne un nom au conteneur
-- `-e VARIABLE=valeur` permet de transmettre une variable d'environnement au lancement du docker
-- `mariadb` est le nom de l'image utilisée (celle créée précédemment)
+- `-d` launches in the background (detached)
+- `--name` gives a name to the container
+- `-e VARIABLE=value` allows passing an environment variable when launching the docker
+- `mariadb` is the name of the image used (the one created previously)
 
-#### consulter les logs :
+#### view the logs:
 
 ```bash
 docker logs -f mariadb_test
 ```
 
-- `-f` permet d'afficher les nouvelles lignes en direct s'il y en a
+- `-f` allows displaying new lines live if there are any
 
-#### entrer dans le conteneur :
+#### enter the container:
 
 ```bash
 docker exec -it mariadb_test bash
 ```
 
-- `-it` mode interactif avec pseudo terminal
-- `mariadb_test` nom du conteneur
-- `bash` lance un shell bash à l'intérieur
+- `-it` interactive mode with pseudo-terminal
+- `mariadb_test` container name
+- `bash` launches a bash shell inside
 
-#### une fois dans le shell du conteneur, se connecter :
+#### once in the container's shell, connect:
 
 ```bash
 mariadb -u root -p"$MDB_ROOT_PASS"
 ```
 
-- `-u` spécifie l'utilisateur
-- `-p` permet d'entrer le mot de passe
+- `-u` specifies the user
+- `-p` allows entering the password
 
-#### une fois connecté au shell MariaDB, vérifier que la base de donnée `wordpress` existe :
+#### once connected to the MariaDB shell, check that the `wordpress` database exists:
 
 ```mariadb
 SHOW DATABASES
 ```
 
-Cette commande affiche le tableau avec les databases présentes. Elle doit afficher le nom de la base de données créée ainsi que les bases de données présentes par défaut :
+This command displays the table with the present databases. It should display the name of the created database as well as the default databases:
 
 ```text
 +--------------------+
@@ -965,48 +966,48 @@ Cette commande affiche le tableau avec les databases présentes. Elle doit affic
 | information_schema |
 | mysql              |
 | performance_schema |
-| wordpress          |  ← si `MDB_NAME=wordpress`
+| wordpress          |  ← if `MDB_NAME=wordpress`
 +--------------------+
 ```
 
 ### DOCKER-COMPOSE
 
-Maintenant que nous avons deux conteneurs, nous pouvons realiser notre premier fichier `docker-compose.yml`.
+Now that we have two containers, we can create our first `docker-compose.yml` file.
 
-#### Qu'est-ce que `docker compose` ?
+#### What is `docker compose`?
 
-Docker Compose permet de lancer plusieurs conteneurs Docker en même temps, en définissant leur configuration (image, commandes, ports, variables, réseau, volumes partagés, etc.) dans un seul fichier `docker-compose.yml`.
-Il simplifie l’orchestration des services en les connectant automatiquement sur un réseau commun et en gérant leur ordre de démarrage.
+Docker Compose allows you to launch several Docker containers at the same time, by defining their configuration (image, commands, ports, variables, network, shared volumes, etc.) in a single `docker-compose.yml` file.
+It simplifies the orchestration of services by automatically connecting them on a common network and managing their startup order.
 
-#### Structure d’un fichier `docker-compose.yml`
+#### Structure of a `docker-compose.yml` file
 
-Un fichier `docker-compose.yml` définit la configuration de plusieurs services Docker dans une seule application.
-Il se compose généralement des sections suivantes :
+A `docker-compose.yml` file defines the configuration of several Docker services in a single application.
+It generally consists of the following sections:
 
-* **`services`** : liste les conteneurs à lancer (ex. : `nginx`, `wordpress`, `mariadb`, etc.).
-* **`build` / `image`** : indique le chemin du `Dockerfile` ou l’image Docker à utiliser.
-* **`ports`** : expose les ports du conteneur vers l’extérieur.
-* **`environment`** : définit les variables d’environnement du service.
-* **`volumes`** : permet de monter des fichiers ou dossiers entre l’hôte et le conteneur.
-* **`networks`** : configure les réseaux pour permettre aux services de communiquer entre eux.
+* **`services`**: lists the containers to be launched (e.g., `nginx`, `wordpress`, `mariadb`, etc.).
+* **`build` / `image`**: indicates the path of the `Dockerfile` or the Docker image to use.
+* **`ports`**: exposes the container's ports to the outside.
+* **`environment`**: defines the service's environment variables.
+* **`volumes`**: allows mounting files or folders between the host and the container.
+* **`networks`**: configures networks to allow services to communicate with each other.
 
-Grâce à `docker-compose`, tous ces services peuvent être démarrés et orchestrés ensemble avec une simple commande :
+Thanks to `docker-compose`, all these services can be started and orchestrated together with a simple command:
 
 ```bash
 docker compose up
 ```
 
-Et ils pourront être stoppés avec la commande :
+And they can be stopped with the command:
 
 ```bash
 docker compose down
 ```
 
-#### Règles de syntaxe YAML pour Docker Compose
+#### YAML syntax rules for Docker Compose
 
-##### 1. **Clé suivie de deux-points**
+##### 1. **Key followed by a colon**
 
-Chaque **clé** est suivie d’un `:` puis d’un espace :
+Each **key** is followed by a `:` then a space:
 
 ```yaml
 services:
@@ -1014,10 +1015,10 @@ services:
     image: mariadb:latest
 ```
 
-##### 2. **Indentation obligatoire (espaces, pas de tabulations)**
+##### 2. **Mandatory indentation (spaces, no tabs)**
 
-* L’indentation se fait uniquement avec des **espaces** (pas de tabulations)
-* La **norme courante** est 2 espaces, mais 4 est accepté aussi.
+* Indentation is done only with **spaces** (no tabs)
+* The **current standard** is 2 spaces, but 4 is also accepted.
 
 ```yaml
 services:
@@ -1025,9 +1026,9 @@ services:
     image: mariadb
 ```
 
-##### 3. **Les listes commencent par `-`**
+##### 3. **Lists start with `-`**
 
-Pour déclarer une **liste d’éléments** :
+To declare a **list of items**:
 
 ```yaml
 ports:
@@ -1035,46 +1036,46 @@ ports:
   - "443:443"
 ```
 
-Chaque `-` doit être aligné, **avec au moins un espace après**.
+Each `-` must be aligned, **with at least one space after**.
 
 
-##### 4. **Les valeurs peuvent être :**
+##### 4. **Values can be:**
 
-* Des chaînes (généralement sans guillemets, sauf si caractères spéciaux)
-* Des booléens (`true`, `false`)
-* Des entiers
-* Des objets imbriqués
+* Strings (usually without quotes, unless special characters)
+* Booleans (`true`, `false`)
+* Integers
+* Nested objects
 
-Exemples :
+Examples:
 
 ```yaml
 restart: always
 environment:
   WP_DEBUG: "true"
-  SITE_NAME: "Mon site perso"
+  SITE_NAME: "My personal site"
 ```
 
-##### 5. **Les chaînes contenant des caractères spéciaux doivent être entre guillemets**
+##### 5. **Strings containing special characters must be in quotes**
 
-Notamment si elles contiennent `:`, `#`, ou commencent par `*`, `&`, `@`, etc.
+Especially if they contain `:`, `#`, or start with `*`, `&`, `@`, etc.
 
 ```yaml
 command: "npm run dev:watch"
 ```
 
-#### Les variables d'environnement
+#### Environment variables
 
-Précédemment, nous avions lancé le conteneur MariaDB avec la commande suivante afin de lui transmettre directement les variables d’environnement :
+Previously, we launched the MariaDB container with the following command to pass it the environment variables directly:
 
 ```bash
 docker run -e DB_NAME=wordpress \
            -e DB_USER=wp_user \
            -e DB_USER_PASS=wp_pass \
            -e DB_ROOT_PASS=rootpass \
-           nom_de_l_image
+           image_name
 ```
 
-Nous allons simplifier les choses en écrivant les variables d’environnement dans un fichier `.env` situé dans le même dossier que le fichier `docker-compose.yml` :
+We will simplify things by writing the environment variables in a `.env` file located in the same folder as the `docker-compose.yml` file:
 
 ```env
 DB_NAME=wordpress
@@ -1083,11 +1084,11 @@ DB_USER_PASS=wp_pass
 DB_ROOT_PASS=rootpass
 ```
 
-Nous pourrons ainsi spécifier dans notre `docker-compose.yml` le fichier à utiliser pour récupérer automatiquement les variables d’environnement.
+We can then specify in our `docker-compose.yml` the file to use to automatically retrieve the environment variables.
 
-#### Creation de notre premier `docker-compose.yml`
+#### Creating our first `docker-compose.yml`
 
-A la racine du dossier `srcs/` de notre projet, nous allons creer un fichier `docker-compose.yml` temporaire pour tester le build et l'execution de nos deux conteneurs Nginx et MariaDB.
+At the root of the `srcs/` folder of our project, we will create a temporary `docker-compose.yml` file to test the build and execution of our two Nginx and MariaDB containers.
 
 ```yaml
 services:
@@ -1114,10 +1115,10 @@ networks:
     driver: bridge
 ```
 
-#### Explications
+#### Explanations
 
-Ce fichier permet de définir et lancer plusieurs conteneurs Docker avec une seule commande (`docker-compose up`).
-Il définit ici deux services : **MariaDB** et **Nginx**, ainsi que les volumes et réseaux nécessaires.
+This file allows you to define and launch several Docker containers with a single command (`docker-compose up`).
+It defines two services here: **MariaDB** and **Nginx**, as well as the necessary volumes and networks.
 
 ##### Services
 
@@ -1125,7 +1126,7 @@ Il définit ici deux services : **MariaDB** et **Nginx**, ainsi que les volumes 
 services:
 ```
 
-*Section principale définissant les conteneurs à créer.*
+*Main section defining the containers to be created.*
 
 * `mariadb`
 
@@ -1133,40 +1134,40 @@ services:
   mariadb:
 ```
 
-*Nom du service (aussi utilisé comme hostname dans le réseau Docker).*
+*Name of the service (also used as hostname in the Docker network).*
 
 ```yaml
     build: requirements/mariadb
 ```
 
-*Indique à Docker de construire l’image à partir du Dockerfile situé dans `requirements/mariadb`.*
+*Tells Docker to build the image from the Dockerfile located in `requirements/mariadb`.*
 
 ```yaml
     container_name: mariadb
 ```
 
-*Nom explicite donné au conteneur (sinon Docker en génère un automatiquement).*
+*Explicit name given to the container (otherwise Docker generates one automatically).*
 
 ```yaml
     env_file: .env
 ```
 
-*Charge les variables d’environnement depuis le fichier `.env` (ex : `MDB_NAME`, `MDB_ROOT_PASS`, etc.).*
+*Loads environment variables from the `.env` file (e.g., `MDB_NAME`, `MDB_ROOT_PASS`, etc.).*
 
 ```yaml
     expose:
       - "3306"
 ```
 
-*Indique que le port 3306 (port MySQL) est exposé **aux autres conteneurs** sur le réseau Docker.
-Ce n’est **pas exposé à l’extérieur** de l’hôte (à la différence de `ports`).*
+*Indicates that port 3306 (MySQL port) is exposed **to other containers** on the Docker network.
+It is **not exposed to the outside** of the host (unlike `ports`).*
 
 ```yaml
     networks:
       - inception
 ```
 
-*Connecte le service au réseau Docker nommé `inception` pour communiquer avec les autres services.*
+*Connects the service to the Docker network named `inception` to communicate with other services.*
 
 ##### `nginx`
 
@@ -1174,46 +1175,46 @@ Ce n’est **pas exposé à l’extérieur** de l’hôte (à la différence de 
   nginx:
 ```
 
-*Nom du service pour le serveur web.*
+*Name of the service for the web server.*
 
 ```yaml
     build: requirements/nginx
 ```
 
-*Construit l’image à partir du Dockerfile dans `requirements/nginx`.*
+*Builds the image from the Dockerfile in `requirements/nginx`.*
 
 ```yaml
     container_name: nginx
 ```
 
-*Nom explicite pour le conteneur.*
+*Explicit name for the container.*
 
 ```yaml
     env_file: .env
 ```
 
-*Charge les variables d’environnement nécessaires à Nginx (par exemple le domaine).*
+*Loads the environment variables necessary for Nginx (for example the domain).*
 
 ```yaml
     ports:
       - "443:443"
 ```
 
-*Expose le port HTTPS 443 **de l’hôte vers le conteneur** pour que le site soit accessible via navigateur.*
-*Cela signifie : redirige le port 443 de la machine hôte vers le port 443 du conteneur.*
-En Docker, un conteneur est isolé de l'extérieur. Pour le rendre accessible depuis l’hôte (et donc le navigateur ou d'autres services externes), il faut publier un port.
+*Exposes the HTTPS port 443 **from the host to the container** so that the site is accessible via a browser.*
+*This means: redirect port 443 of the host machine to port 443 of the container.*
+In Docker, a container is isolated from the outside. To make it accessible from the host (and therefore the browser or other external services), you must publish a port.
 
 ```yaml
     networks:
       - inception
 ```
 
-*Connecte Nginx au réseau Docker `inception`, ce qui permet par exemple d’accéder à `mariadb` via le hostname `mariadb`.*
+*Connects Nginx to the `inception` Docker network, which allows, for example, to access `mariadb` via the hostname `mariadb`.*
 
-##### Réseau
+##### Network
 
-Chaque conteneur lancé avec Docker Compose est connecté par défaut à un réseau isolé.
-En définissant un réseau personnalisé (ici `inception`), tous les services y sont connectés et peuvent communiquer entre eux par leur nom de service (comme mariadb, nginx, wordpress…).
+Each container launched with Docker Compose is connected by default to an isolated network.
+By defining a custom network (here `inception`), all services are connected to it and can communicate with each other by their service name (like mariadb, nginx, wordpress…).
 
 ```yaml
 networks:
@@ -1221,60 +1222,60 @@ networks:
     driver: bridge
 ```
 
-*Crée un réseau personnalisé de type `bridge` pour que les conteneurs puissent **se reconnaître entre eux par leur nom de service**.*
+*Creates a custom `bridge` type network so that containers can **recognize each other by their service name**.*
 
-Ce réseau est de type `bridge`, le plus courant pour les réseaux internes.
-Grâce à cela, dans le fichier de configuration WordPress ou Nginx, on peut définir mariadb comme adresse de la base de données, au lieu de chercher une IP.
-Cela simplifie énormément l’interconnexion entre les services dans un environnement multi-conteneurs.
+This network is of type `bridge`, the most common for internal networks.
+Thanks to this, in the WordPress or Nginx configuration file, we can define mariadb as the database address, instead of looking for an IP.
+This greatly simplifies the interconnection between services in a multi-container environment.
 
-#### Tester le `docker-compose.yml`
+#### Testing the `docker-compose.yml`
 
-Pour lancer l'exécution du `docker-compose`, placez-vous dans le répertoire contenant le fichier, puis tapez la commande suivante :
+To launch the execution of the `docker-compose`, place yourself in the directory containing the file, then type the following command:
 
 ```bash
 docker compose up
 ```
 
-> Cette commande fait plusieurs choses importantes :
+> This command does several important things:
 >
-> 1. **Construit les images Docker** (si elles ne sont pas déjà présentes ou si le `Dockerfile` a changé), en se basant sur les instructions de chaque service défini dans le fichier `docker-compose.yml`.
+> 1. **Builds the Docker images** (if they are not already present or if the `Dockerfile` has changed), based on the instructions of each service defined in the `docker-compose.yml` file.
 >
-> 2. **Crée les conteneurs** nécessaires, en utilisant ces images.
+> 2. **Creates the necessary containers**, using these images.
 >
-> 3. **Crée les réseaux et volumes** définis dans le fichier `docker-compose.yml` (s’ils n’existent pas déjà).
+> 3. **Creates the networks and volumes** defined in the `docker-compose.yml` file (if they do not already exist).
 >
-> 4. **Lance tous les conteneurs en parallèle**, en respectant les dépendances (`depends_on`) et les configurations (ports, variables d’environnement, volumes…).
+> 4. **Launches all containers in parallel**, respecting dependencies (`depends_on`) and configurations (ports, environment variables, volumes…).
 >
-> Par défaut, elle affiche les **logs de tous les conteneurs en temps réel** dans le terminal.
-> Pour la lancer en arrière-plan (mode détaché), on peut utiliser :
+> By default, it displays the **logs of all containers in real time** in the terminal.
+> To launch it in the background (detached mode), you can use:
 >
 > ```bash
 > docker compose up -d
 > ```
 > 
-> Cela permet de continuer à utiliser le terminal tout en laissant les conteneurs tourner en arrière-plan.
+> This allows you to continue using the terminal while leaving the containers running in the background.
 
-Ouvrez ensuite un navigateur internet et entrez dans la barre d'adresse :
+Then open a web browser and enter in the address bar:
 
 ```text
 https://localhost
 ```
 
-Le navigateur devrait renvoyer une erreur **403 Forbidden**, ce qui est **normal à ce stade** : Nginx tente d'accéder à WordPress, qui n'est pas encore installé (comme prévu dans sa configuration).
+The browser should return a **403 Forbidden** error, which is **normal at this stage**: Nginx is trying to access WordPress, which is not yet installed (as planned in its configuration).
 
-Vous pouvez également vous connecter au conteneur MariaDB avec la commande :
+You can also connect to the MariaDB container with the command:
 
 ```bash
 docker exec -it mariadb bash
 ```
 
-Puis, connectez-vous au serveur MariaDB avec les identifiants définis dans votre fichier `.env` :
+Then, connect to the MariaDB server with the credentials defined in your `.env` file:
 
 ```bash
-mariadb -u<nom_utilisateur> -p<mot_de_passe_utilisateur>
+mariadb -u<username> -p<user_password>
 ```
 
-Une fois connecté, la commande suivante affichera la liste des bases de données (dont la base `wordpress`, si tout s’est bien déroulé) :
+Once connected, the following command will display the list of databases (including the `wordpress` database, if everything went well):
 
 ```sql
 SHOW DATABASES;
@@ -1282,39 +1283,39 @@ SHOW DATABASES;
 
 ---
 
-## DOCKER WORDPRESS
+## WORDPRESS DOCKER
 
-WordPress est un système de gestion de contenu (CMS – Content Management System) open source, largement utilisé pour créer et administrer des sites web, des blogs ou même des boutiques en ligne.
-Écrit en PHP et utilisant une base de données MySQL/MariaDB, il permet à des utilisateurs sans compétences en développement de publier du contenu facilement via une interface web intuitive.
+WordPress is an open-source Content Management System (CMS), widely used to create and manage websites, blogs, or even online stores.
+Written in PHP and using a MySQL/MariaDB database, it allows users without development skills to easily publish content via an intuitive web interface.
 
-Dans le cadre du projet Inception, ce conteneur permet d’héberger un site WordPress fonctionnel, configuré automatiquement au démarrage, et connecté au conteneur MariaDB pour la gestion des données.
-L'installation est faite à l’aide de la ligne de commande `wp-cli`, ce qui permet une configuration rapide et sans intervention manuelle.
+In the context of the Inception project, this container allows hosting a functional WordPress site, automatically configured at startup, and connected to the MariaDB container for data management.
+The installation is done using the `wp-cli` command line, which allows for quick configuration without manual intervention.
 
-### FICHIER DE CONFIGURATION PHP-FPM (`www.conf`)
+### PHP-FPM CONFIGURATION FILE (`www.conf`)
 
-Comme pour MariaDB ou Nginx, nous allons commencer par creer un fichier de configuration PHP-FPM `www.conf` pour wordpress, que nous placerons dans le dossier `conf`.
+As with MariaDB or Nginx, we will start by creating a PHP-FPM configuration file `www.conf` for wordpress, which we will place in the `conf` folder.
 
-PHP-FPM signifie PHP FastCGI Process Manager.
-C’est une interface entre un serveur web (comme NGINX) et le moteur PHP.
-Il permet d’exécuter des scripts PHP de manière performante, flexible, et sécurisée.
+PHP-FPM means PHP FastCGI Process Manager.
+It is an interface between a web server (like NGINX) and the PHP engine.
+It allows executing PHP scripts in a performant, flexible, and secure way.
 
-Les serveurs comme NGINX ne savent pas exécuter directement du PHP.
-Ils transmettent donc les requêtes PHP à un service externe — ici, PHP-FPM — qui se charge de :
-- lancer des processus PHP
-- exécuter le code PHP (comme index.php)
-- renvoyer le résultat (HTML) à NGINX pour affichage
+Servers like NGINX do not know how to execute PHP directly.
+They therefore transmit PHP requests to an external service — here, PHP-FPM — which is responsible for:
+- launching PHP processes
+- executing PHP code (like index.php)
+- returning the result (HTML) to NGINX for display
 
-#### Fonctionnement de PHP-FPM :
-- Le serveur NGINX reçoit une requête vers un fichier .php
-- Il la redirige via fastcgi_pass vers PHP-FPM
-- PHP-FPM fait tourner le code PHP avec les bonnes variables d’environnement, les fichiers, etc.
-- Il renvoie le résultat à NGINX, qui l’affiche au navigateur
+#### How PHP-FPM works:
+- The NGINX server receives a request for a .php file
+- It redirects it via fastcgi_pass to PHP-FPM
+- PHP-FPM runs the PHP code with the correct environment variables, files, etc.
+- It returns the result to NGINX, which displays it in the browser
 
-> PHP-FPM (FastCGI Process Manager) est un service qui permet d’exécuter le code PHP à la place de NGINX.
-> Il agit comme une passerelle entre le serveur web et le moteur PHP, en lançant des processus PHP configurables à la demande.
-> Dans ce projet, PHP-FPM est utilisé pour traiter les requêtes envoyées au site WordPress de manière performante et sécurisée.
+> PHP-FPM (FastCGI Process Manager) is a service that allows executing PHP code instead of NGINX.
+> It acts as a gateway between the web server and the PHP engine, by launching configurable PHP processes on demand.
+> In this project, PHP-FPM is used to process requests sent to the WordPress site in a performant and secure way.
 
-#### Le fichier `www.conf`
+#### The `www.conf` file
 
 ```conf
 [www]
@@ -1331,199 +1332,199 @@ pm.max_spare_servers = 3
 clear_env = no
 ```
 
-#### Explications
+#### Explanations
 
-Le fichier de configuration PHP-FPM (`www.conf`) configure **PHP-FPM**, le gestionnaire de processus FastCGI utilisé pour exécuter les scripts PHP dans le conteneur WordPress.
-Voici une explication des directives utilisées :
+The PHP-FPM configuration file (`www.conf`) configures **PHP-FPM**, the FastCGI process manager used to execute PHP scripts in the WordPress container.
+Here is an explanation of the directives used:
 
 ```ini
 [www]
 ```
 
-Déclare un nouveau *pool* de processus nommé `www`. Chaque pool est une instance indépendante de PHP-FPM.
+Declares a new process *pool* named `www`. Each pool is an independent instance of PHP-FPM.
 
-> Chaque fichier de configuration commence par un nom de pool entre crochets, ici [www].
-> Il permet de distinguer plusieurs groupes de processus si nécessaire (non utile pour Inception, mais bon à savoir).
-> Un pool est un groupe indépendant de processus PHP-FPM qui gère les requêtes PHP.
-> Chaque pool fonctionne comme une "unité de traitement" avec sa propre configuration et ses propres processus.
-> Chaque pool peut :
-> - écouter sur un port ou un socket différent
-> - utiliser un utilisateur/groupe système différent
-> - avoir sa propre stratégie de gestion de charge (nombre de processus, etc.)
-> - charger un fichier php.ini différent
-> - être isolé pour des raisons de sécurité ou performance
-> Autrement dit : un pool = un ensemble de workers PHP qui tournent sous certaines règles.
+> Each configuration file begins with a pool name in square brackets, here [www].
+> It allows distinguishing several groups of processes if necessary (not useful for Inception, but good to know).
+> A pool is an independent group of PHP-FPM processes that manages PHP requests.
+> Each pool functions as a "processing unit" with its own configuration and its own processes.
+> Each pool can:
+> - listen on a different port or socket
+> - use a different system user/group
+> - have its own load management strategy (number of processes, etc.)
+> - load a different php.ini file
+> - be isolated for security or performance reasons
+> In other words: a pool = a set of PHP workers that run under certain rules.
 
 ```ini
 user = www-data
 group = www-data
 ```
 
-Spécifie l’utilisateur et le groupe Unix sous lesquels s’exécuteront les processus PHP.
-`www-data` est l’utilisateur standard pour les services web (NGINX, PHP).
+Specifies the Unix user and group under which the PHP processes will run.
+`www-data` is the standard user for web services (NGINX, PHP).
 
 ```ini
 listen = 0.0.0.0:9000
 ```
 
-Indique que PHP-FPM écoutera les connexions FastCGI sur le port TCP 9000.
-Cela permet à NGINX de communiquer avec PHP-FPM via le réseau interne Docker (`fastcgi_pass wordpress:9000;`).
+Indicates that PHP-FPM will listen for FastCGI connections on TCP port 9000.
+This allows NGINX to communicate with PHP-FPM via the internal Docker network (`fastcgi_pass wordpress:9000;`).
 
 ```ini
 listen.owner = www-data
 listen.group = www-data
 ```
 
-Définit les droits d’accès au socket ou au port.
-Ici, même si on utilise un port TCP, cette configuration est conservée pour rester cohérente ou dans le cas d’un passage à un socket Unix.
+Defines the access rights to the socket or port.
+Here, even if we use a TCP port, this configuration is kept to remain consistent or in the case of a switch to a Unix socket.
 
 ```ini
 pm = dynamic
 ```
 
-Active la gestion dynamique des processus.
-PHP-FPM ajustera automatiquement le nombre de processus enfants en fonction de la charge du serveur.
+Enables dynamic process management.
+PHP-FPM will automatically adjust the number of child processes based on the server load.
 
-> Puisque le paramètre `pm` est défini sur `dynamic`, nous devons obligatoirement définir les paramètres suivants :
+> Since the `pm` parameter is set to `dynamic`, we must define the following parameters:
 > `pm.max_children`, `pm.start_servers`, `pm.min_spare_servers`, `pm.max_spare_servers`.
-> Si nous avions utilisé `pm = static`, seul le paramètre `pm.max_children` aurait été obligatoire.
+> If we had used `pm = static`, only the `pm.max_children` parameter would have been mandatory.
 
 ```ini
 pm.max_children = 5
 ```
 
-Nombre maximal de processus enfants autorisés.
-Cela limite l’utilisation mémoire dans un conteneur léger.
+Maximum number of child processes allowed.
+This limits memory usage in a lightweight container.
 
 ```ini
 pm.start_servers = 2
 ```
 
-Nombre de processus lancés au démarrage du service.
+Number of processes launched at service startup.
 
 ```ini
 pm.min_spare_servers = 1
 pm.max_spare_servers = 3
 ```
 
-Nombre minimal et maximal de processus inactifs que PHP-FPM doit garder prêts à traiter les requêtes.
-Permet d’éviter les délais de démarrage lors d’un pic de charge.
+Minimum and maximum number of idle processes that PHP-FPM must keep ready to process requests.
+Helps avoid startup delays during a load spike.
 
 ```ini
 clear_env = no
 ```
 
-Permet à PHP-FPM d’hériter des variables d’environnement.
-C’est **essentiel** dans le contexte Docker, car WordPress utilise ces variables (définies dans le `.env`) pour sa configuration automatique via WP-CLI.
+Allows PHP-FPM to inherit environment variables.
+This is **essential** in the Docker context, as WordPress uses these variables (defined in the `.env`) for its automatic configuration via WP-CLI.
 
-### COMPOSANTS NECESSAIRES A L'EXECUTION DE WORPRESS
+### COMPONENTS NEEDED TO RUN WORDPRESS
 
-Avant de créer le `Dockerfile`, faisons un point sur les composants à installer pour faire fonctionner Woorpress :
+Before creating the `Dockerfile`, let's review the components to install to make WordPress work:
 
-Le conteneur WordPress repose sur une image de base Debian minimale.
-Il est nécessaire d'y installer manuellement PHP, les extensions requises, ainsi que des outils système complémentaires pour que WordPress puisse fonctionner correctement.
-Voici la liste des paquets à installer dans le `Dockerfile` :
+The WordPress container is based on a minimal Debian base image.
+It is necessary to manually install PHP, the required extensions, as well as complementary system tools for WordPress to function correctly.
+Here is the list of packages to install in the `Dockerfile`:
 
-#### PHP et son interpréteur
+#### PHP and its interpreter
 
 * `php`
-  Installe le moteur PHP ainsi que le binaire principal (`php`).
-  C’est la base pour exécuter tout code WordPress, qui repose entièrement sur PHP.
+  Installs the PHP engine as well as the main binary (`php`).
+  This is the basis for executing any WordPress code, which relies entirely on PHP.
 
-  > PHP est un langage de programmation côté serveur principalement utilisé pour créer des sites web dynamiques, comme WordPress, en générant du HTML en réponse aux requêtes HTTP.
+  > PHP is a server-side programming language mainly used to create dynamic websites, like WordPress, by generating HTML in response to HTTP requests.
 
 * `php-fpm`
-  Installe **PHP-FPM** (FastCGI Process Manager), un gestionnaire de processus permettant à un serveur web comme **NGINX** de déléguer l’exécution des scripts PHP à un service dédié via le protocole FastCGI.
-  Obligatoire pour séparer les rôles entre conteneurs (NGINX ↔ WordPress).
+  Installs **PHP-FPM** (FastCGI Process Manager), a process manager allowing a web server like **NGINX** to delegate the execution of PHP scripts to a dedicated service via the FastCGI protocol.
+  Mandatory to separate roles between containers (NGINX ↔ WordPress).
 
-#### Extensions PHP obligatoires pour WordPress
+#### Mandatory PHP extensions for WordPress
 
 * `php-mysql`
-  Cette extension permet à PHP d’interagir avec une base de données MySQL ou MariaDB via les interfaces MySQLi (améliorée) et PDO_MySQL (orientée objet). WordPress utilise ces interfaces pour établir une connexion avec la base de données, exécuter des requêtes SQL, récupérer les articles, les utilisateurs, les paramètres du site, etc.
-  Sans cette extension, aucune connexion à la base de données ne serait possible, ce qui empêcherait complètement WordPress de fonctionner (le site afficherait une erreur critique dès le chargement).
-  C’est l’une des extensions absolument indispensables pour toute installation WordPress.
+  This extension allows PHP to interact with a MySQL or MariaDB database via the MySQLi (improved) and PDO_MySQL (object-oriented) interfaces. WordPress uses these interfaces to establish a connection with the database, execute SQL queries, retrieve posts, users, site settings, etc.
+  Without this extension, no connection to the database would be possible, which would completely prevent WordPress from functioning (the site would display a critical error upon loading).
+  It is one of the absolutely essential extensions for any WordPress installation.
 
 * `php-curl`
-  Permet à WordPress d’effectuer des **requêtes HTTP depuis le serveur**, ce qui est indispensable pour installer des extensions, interagir avec des API, ou télécharger des fichiers.
+  Allows WordPress to make **HTTP requests from the server**, which is essential for installing extensions, interacting with APIs, or downloading files.
 
 * `php-gd`
-  Bibliothèque de manipulation d’images. Nécessaire pour **générer des vignettes, redimensionner des images** dans la médiathèque WordPress, etc.
+  Image manipulation library. Necessary for **generating thumbnails, resizing images** in the WordPress media library, etc.
 
 * `php-mbstring`
-  Gère les chaînes multioctets (UTF-8, Unicode). Indispensable pour **la compatibilité avec les langues internationales** et de nombreux plugins.
+  Manages multibyte strings (UTF-8, Unicode). Essential for **compatibility with international languages** and many plugins.
 
 * `php-xml`
-  Permet de **lire et écrire des fichiers XML**, notamment pour la gestion des flux RSS, des éditeurs, et des APIs internes.
+  Allows **reading and writing XML files**, especially for managing RSS feeds, editors, and internal APIs.
 
 * `php-xmlrpc`
-  Supporte les **requêtes distantes XML-RPC**, utilisées par l’API historique de WordPress. Encore utilisé par certains clients mobiles, éditeurs distants ou plugins.
+  Supports **XML-RPC remote requests**, used by the historical WordPress API. Still used by some mobile clients, remote editors, or plugins.
 
 * `php-soap`
-  Permet les communications via le protocole **SOAP**, utilisé par certains plugins tiers ou services d’import/export.
+  Allows communications via the **SOAP** protocol, used by some third-party plugins or import/export services.
 
 * `php-zip`
-  Permet la **lecture et l’extraction d’archives ZIP**, indispensable pour l'installation de plugins, thèmes ou mises à jour via l’interface WordPress.
+  Allows **reading and extracting ZIP archives**, essential for installing plugins, themes, or updates via the WordPress interface.
 
 * `php-intl`
-  Fournit des fonctions de **localisation, tri, et mise en forme des dates et chaînes** selon la langue. Requis pour la prise en charge de WordPress en français et d'autres langues.
+  Provides functions for **localization, sorting, and formatting of dates and strings** according to the language. Required for supporting WordPress in French and other languages.
 
 * `php-opcache`
-  Améliore les performances de PHP en **mémorisant le code compilé**. Fortement recommandé pour tout site WordPress, même en développement.
+  Improves PHP performance by **caching compiled code**. Strongly recommended for any WordPress site, even in development.
 
-### # Outils complémentaires
+### # Complementary tools
 
 * `curl`
-  Utilisé pour télécharger **WP-CLI** et WordPress. Outil en ligne de commande plus polyvalent que `wget`.
+  Used to download **WP-CLI** and WordPress. A more versatile command-line tool than `wget`.
 
 * `mariadb-client`
-  Permet de tester ou diagnostiquer manuellement la connexion à la base de données depuis le conteneur WordPress. Utile pendant le développement, mais pas strictement requis à l’exécution.
+  Allows manually testing or diagnosing the connection to the database from the WordPress container. Useful during development, but not strictly required at runtime.
 
 ### WP-CLI
 
-Le sujet Inception **interdit toute configuration manuelle post-déploiement**. Or, une installation WordPress classique nécessite de :
+The Inception subject **prohibits any manual post-deployment configuration**. However, a classic WordPress installation requires:
 
-1. Créer manuellement le fichier `wp-config.php` (avec les infos de la base de données)
-2. Lancer le setup via un navigateur web
-3. Entrer les identifiants admin, nom du site, URL, etc.
-4. Créer un utilisateur supplémentaire (facultatif)
+1. Manually creating the `wp-config.php` file (with the database information)
+2. Launching the setup via a web browser
+3. Entering the admin credentials, site name, URL, etc.
+4. Creating an additional user (optional)
 
-Ces étapes nécessitent une interface web et une interaction humaine, **ce qui est incompatible avec un déploiement automatisé dans un conteneur**.
+These steps require a web interface and human interaction, **which is incompatible with an automated deployment in a container**.
 
-En plus d'installer `php` (et ses dépendances) et `wordpress`, nous allons donc devoir installer **WP-CLI**, un outil en ligne de commande permettant de gérer une installation WordPress de façon automatisée, sans passer par l’interface web.
-Une fois installé comme exécutable dans `/usr/local/bin`, il peut être utilisé via la simple commande `wp`.
+In addition to installing `php` (and its dependencies) and `wordpress`, we will therefore have to install **WP-CLI**, a command-line tool for managing a WordPress installation in an automated way, without going through the web interface.
+Once installed as an executable in `/usr/local/bin`, it can be used via the simple command `wp`.
 
-WP-CLI permet d’automatiser :
+WP-CLI allows automating:
 
-* La création du fichier `wp-config.php` :
+* The creation of the `wp-config.php` file:
 
   ```bash
   wp config create --dbname="$MDB_NAME" --dbuser="$MDB_USER" --dbpass="$MDB_USER_PASS" --dbhost="mariadb"
   ```
 
-* L'installation complète de WordPress :
+* The complete installation of WordPress:
 
   ```bash
   wp core install --url="$DOMAIN_NAME" --title="$WEBSITE_TITLE" --admin_user="$WP_ADMIN_LOGIN" ...
   ```
 
-* La création d’un compte utilisateur secondaire :
+* The creation of a secondary user account:
 
   ```bash
   wp user create "$WP_USER_LOGIN" "$WP_USER_EMAIL" --role=author ...
   ```
 
-* La configuration de Redis ou d’autres paramètres via :
+* The configuration of Redis or other settings via:
 
   ```bash
   wp config set WP_REDIS_HOST redis
   ```
 
-> WP-CLI est un composant **clé** pour automatiser toute l’installation de WordPress dans un environnement Docker, comme exigé dans le projet Inception.
-> Il remplace toutes les étapes interactives du setup WordPress par des **commandes exécutables dans un script**, ce qui garantit un déploiement cohérent, rapide et sans intervention manuelle.
+> WP-CLI is a **key** component for automating the entire WordPress installation in a Docker environment, as required in the Inception project.
+> It replaces all interactive steps of the WordPress setup with **executable commands in a script**, which ensures a consistent, fast, and manual-intervention-free deployment.
 
-### DOCKERFILE WORDPRESS
+### WORDPRESS DOCKERFILE
 
-#### Contenu du fichier
+#### File content
 
 ```conf
 FROM debian:11.11
@@ -1570,13 +1571,13 @@ WORKDIR /var/www/wordpress
 ENTRYPOINT [ "/entrypoint.sh" ]
 ```
 
-#### Explications
+#### Explanations
 
 ```dockerfile
 FROM debian:11.11
 ```
 
-Définit l’image de base. Ici, une image Debian stable (version 11.11) est utilisée pour sa compatibilité avec PHP 7.4, requis par de nombreux plugins WordPress.
+Defines the base image. Here, a stable Debian image (version 11.11) is used for its compatibility with PHP 7.4, required by many WordPress plugins.
 
 ```dockerfile
 RUN apt update -y \
@@ -1599,34 +1600,34 @@ RUN apt update -y \
     && rm -rf /var/lib/apt/lists/*
 ```
 
-Met à jour les paquets et installe :
+Updates packages and installs:
 
-* **PHP** et son interpréteur PHP-FPM
-* Toutes les **extensions nécessaires à WordPress** : base de données (`php-mysql`), gestion du texte (`php-mbstring`), manipulation d'images (`php-gd`), gestion XML/RSS (`php-xml`), SOAP/XML-RPC (`php-soap`, `php-xmlrpc`), fichiers ZIP (`php-zip`), internationalisation (`php-intl`), et performances (`php-opcache`)
-* Le **client MariaDB** pour tester la connexion à la base
-* **curl**, utilisé pour télécharger WordPress et WP-CLI
+* **PHP** and its PHP-FPM interpreter
+* All **extensions necessary for WordPress**: database (`php-mysql`), text management (`php-mbstring`), image manipulation (`php-gd`), XML/RSS management (`php-xml`), SOAP/XML-RPC (`php-soap`, `php-xmlrpc`), ZIP files (`php-zip`), internationalization (`php-intl`), and performance (`php-opcache`)
+* The **MariaDB client** to test the connection to the database
+* **curl**, used to download WordPress and WP-CLI
 
-Enfin, le cache des paquets est nettoyé pour alléger l’image.
+Finally, the package cache is cleaned to lighten the image.
 
 ```dockerfile
 RUN mkdir -p /run/php
 ```
 
-Cette commande crée manuellement le répertoire `/run/php`, qui est nécessaire au fonctionnement de PHP-FPM. En effet, lors de son démarrage, PHP-FPM cherche à créer un socket Unix (fichier spécial de communication inter-processus) dans ce dossier, par défaut à l’emplacement suivant : `/run/php/php7.4-fpm.sock`.
-Si ce dossier n’existe pas, le service PHP-FPM échoue au démarrage.
-Créer ce dossier préventivement garantit la compatibilité et évite toute erreur au démarrage de PHP-FPM, surtout dans un conteneur léger où beaucoup de répertoires ne sont pas créés automatiquement.
+This command manually creates the `/run/php` directory, which is necessary for the operation of PHP-FPM. Indeed, when it starts, PHP-FPM tries to create a Unix socket (a special inter-process communication file) in this folder, by default at the following location: `/run/php/php7.4-fpm.sock`.
+If this folder does not exist, the PHP-FPM service fails to start.
+Creating this folder preventively ensures compatibility and avoids any error at PHP-FPM startup, especially in a lightweight container where many directories are not created automatically.
 
 ```dockerfile
 COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 ```
 
-Copie le fichier de configuration `www.conf` dans le dossier de configuration de PHP-FPM.
-Ce fichier définit :
+Copies the `www.conf` configuration file into the PHP-FPM configuration folder.
+This file defines:
 
-* le port d'écoute (9000)
-* l’utilisateur (`www-data`)
-* la stratégie de gestion des processus (`pm = dynamic`, etc.)
-* le transfert des variables d’environnement (`clear_env = no`)
+* the listening port (9000)
+* the user (`www-data`)
+* the process management strategy (`pm = dynamic`, etc.)
+* the transfer of environment variables (`clear_env = no`)
 
 ```dockerfile
 RUN curl -o /var/www/wordpress.tar.gz https://fr.wordpress.org/wordpress-6.8.2-fr_FR.tar.gz && \
@@ -1635,8 +1636,8 @@ RUN curl -o /var/www/wordpress.tar.gz https://fr.wordpress.org/wordpress-6.8.2-f
     chown -R www-data:www-data /var/www/wordpress
 ```
 
-Télécharge l’archive WordPress officielle en français (version 6.8.2), l’extrait dans `/var/www`, puis supprime l’archive.
-Les fichiers sont ensuite attribués à l’utilisateur `www-data` pour permettre à PHP-FPM d’y accéder en lecture/écriture.
+Downloads the official French WordPress archive (version 6.8.2), extracts it to `/var/www`, then deletes the archive.
+The files are then assigned to the `www-data` user to allow PHP-FPM to access them in read/write.
 
 ```dockerfile
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
@@ -1644,114 +1645,117 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
     mv wp-cli.phar /usr/local/bin/wp
 ```
 
-Télécharge WP-CLI (outil en ligne de commande pour gérer WordPress), lui donne les droits d’exécution, et le déplace dans `/usr/local/bin` pour pouvoir l’appeler simplement avec `wp`.
+Downloads WP-CLI (command-line tool for managing WordPress), gives it execution rights, and moves it to `/usr/local/bin` to be able to call it simply with `wp`.
 
 ```dockerfile
 EXPOSE 9000
 ```
 
-Indique que le conteneur écoute sur le port **9000**, utilisé par **PHP-FPM** pour recevoir les requêtes FastCGI du conteneur NGINX.
+Indicates that the container is listening on port **9000**, used by **PHP-FPM** to receive FastCGI requests from the NGINX container.
 
 ```dockerfile
 COPY tools/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ```
 
-Copie le script `entrypoint.sh` dans le conteneur et le rend exécutable.
-Ce script initialise WordPress automatiquement au démarrage, en utilisant WP-CLI (`wp config create`, `wp core install`, etc.).
+Copies the `entrypoint.sh` script into the container and makes it executable.
+This script automatically initializes WordPress at startup, using WP-CLI (`wp config create`, `wp core install`, etc.).
 
 ```dockerfile
 WORKDIR /var/www/wordpress
 ```
 
-Fixe le répertoire de travail pour les instructions suivantes et pour le conteneur au runtime.
-Cela permet notamment d'exécuter `wp` sans avoir à spécifier `--path`.
+Sets the working directory for the following instructions and for the container at runtime.
+This allows, in particular, to run `wp` without having to specify `--path`.
 
 ```dockerfile
 ENTRYPOINT [ "/entrypoint.sh" ]
 ```
 
-Définit le point d’entrée du conteneur : le script `entrypoint.sh` sera exécuté automatiquement au lancement, pour configurer et lancer WordPress.
+Defines the entry point of the container: the `entrypoint.sh` script will be executed automatically at launch, to configure and launch WordPress.
 
-### LE SCRIPT `entrypoint.sh`
+### THE `entrypoint.sh` SCRIPT
 
-Dans un conteneur Docker, le script `entrypoint.sh` agit comme **le point de départ** de l’exécution.
-C’est lui qui est appelé automatiquement au lancement du conteneur (grâce à la directive `ENTRYPOINT` dans le `Dockerfile`).
+In a Docker container, the `entrypoint.sh` script acts as **the starting point** of execution.
+It is the one that is called automatically when the container is launched (thanks to the `ENTRYPOINT` directive in the `Dockerfile`).
 
-#### Rôle du script
+#### Role of the script
 
-Dans le cadre du projet Inception, ce script permet de **préparer et lancer automatiquement WordPress** dès le démarrage du conteneur, sans aucune intervention manuelle.
+In the context of the Inception project, this script allows **automatically preparing and launching WordPress** as soon as the container starts, without any manual intervention.
 
-Concrètement, il va :
+Concretely, it will:
 
-1. Vérifier si WordPress est déjà configuré (ex : si `wp-config.php` existe)
-2. Si ce n’est pas le cas :
-   * Générer un fichier `wp-config.php` avec les bonnes variables d’environnement
-   * Installer WordPress (`wp core install`) avec les identifiants admin, l’URL, le titre du site, etc.
-   * Créer un utilisateur secondaire
-   * Appliquer éventuellement d’autres réglages (comme Redis pour les bonus)
-3. Démarrer le service PHP-FPM en mode **foreground** (`-F`) pour que le conteneur reste actif
+1. Check if WordPress is already configured (e.g., if `wp-config.php` exists)
+2. If not:
+   * Generate a `wp-config.php` file with the correct environment variables
+   * Install WordPress (`wp core install`) with the admin credentials, URL, site title, etc.
+   * Create a secondary user
+   * Possibly apply other settings (like Redis for bonuses)
+3. Start the PHP-FPM service in **foreground** mode (`-F`) so that the container remains active
 
-#### Pourquoi ne pas faire ça dans le Dockerfile ?
+#### Why not do this in the Dockerfile?
 
-Parce que le `Dockerfile` est **exécuté à la construction de l’image**, et que WordPress **doit être configuré dynamiquement à chaque exécution du conteneur**, en fonction :
+Because the `Dockerfile` is **executed when the image is built**, and WordPress **must be configured dynamically each time the container is run**, depending on:
 
-* des **variables d’environnement** (`MDB_NAME`, `WP_ADMIN_LOGIN`, etc.)
-* de l’état de la base de données (vide ou non)
-* ou même du volume partagé (le `wp-config.php` peut déjà exister)
+* the **environment variables** (`MDB_NAME`, `WP_ADMIN_LOGIN`, etc.)
+* the state of the database (empty or not)
+* or even the shared volume (the `wp-config.php` may already exist)
 
-Seul un **script exécuté au runtime** (au démarrage du conteneur) peut gérer cette logique conditionnelle.
+Only a **script executed at runtime** (at container startup) can handle this conditional logic.
 
-#### Variables d'environnement
+#### Environment variables
 
-Afin de configurer `worpdress` nous allons devoir ajouter certaines variables d'environnement dans notre fichier `.env` :
+In order to configure `wordpress` we will have to add certain environment variables to our `.env` file:
 
 * `DOMAIN_NAME`
-  Le nome de domaine : <login>.42.fr comme exigé par le sujet
+  The domain name: <login>.42.fr as required by the subject
 
 * `WEBSITE_TITLE`
-  Le nom du site
+  The name of the site
 
 * `WP_ADMIN_LOGIN`
-  Le login de l'administrateur du site
+  The site administrator's login
 
 * `WP_ADMIN_PASS`
-  Le mot de passe administrateur
+  The administrator password
 
 * `WP_ADMIN_EMAIL`
-  Le mail de l'administrateur
+  The administrator's email
 
 * `WP_USER_LOGIN`
-  Le login d'utilisateur
+  The user's login
+
+* `WP_USER_EMAIL`
+  The user's email
 
 * `WP_USER_PASS`
-  Le mot de passe de l'utilisateur
+  The user's password
 
 ```env
 # MariaDB Configuration
 MDB_NAME=inception
-MDB_USER=<votre_nom_d_utilisateur>
+MDB_USER=<your_username>
 MDB_ROOT_PASS=<password>
 MDB_USER_PASS=<password>
 
 # WordPress Configuration
 DOMAIN_NAME=<login>.42.fr
 WEBSITE_TITLE=Inception
-WP_ADMIN_LOGIN=<votre_nom_d_admin>
-WP_ADMIN_EMAIL=<votre_mail_admin>
+WP_ADMIN_LOGIN=<your_admin_name>
+WP_ADMIN_EMAIL=<your_admin_email>
 WP_ADMIN_PASS=<password>
-WP_USER_LOGIN=<votre_nom_d_utilisateur>
-WP_USER_EMAIL=<votre_mail_utilisateur>
+WP_USER_LOGIN=<your_username>
+WP_USER_EMAIL=<your_user_email>
 WP_USER_PASS=<password>
 ```
 
-#### Le script
+#### The script
 
 ```bash
 #!/bin/bash
 
 until mysqladmin ping -h"mariadb" -u"$MDB_USER" -p"$MDB_USER_PASS" --silent; do
-  # Afficher un message toutes les 2 secondes pendant l'attente
+  # Display a message every 2 seconds while waiting
   echo "Waiting for MariaDB to be ready..."
   sleep 2
 done
@@ -1793,19 +1797,19 @@ echo "Launching PHP-FPM..."
 exec /usr/sbin/php-fpm7.4 -F
 ```
 
-#### Explications
+#### Explanations
 
 ```bash
 #!/bin/bash
 ```
 
-Indique que le script doit être interprété avec Bash.
+Indicates that the script should be interpreted with Bash.
 
 ```bash
 if [ ! -f wp-config.php ]; then
 ```
 
-Teste si le fichier `wp-config.php` n’existe pas encore. Si c’est le cas, cela signifie que WordPress n’est pas encore configuré
+Tests if the `wp-config.php` file does not yet exist. If so, it means that WordPress is not yet configured.
 
 ```bash
 until mysqladmin ping -h"mariadb" -u"$MDB_USER" -p"$MDB_USER_PASS" --silent; do
@@ -1814,24 +1818,24 @@ until mysqladmin ping -h"mariadb" -u"$MDB_USER" -p"$MDB_USER_PASS" --silent; do
 done
 ```
 
-Avant de lancer l'installation de WordPress avec WP-CLI, on vérifie que le service MariaDB est bien opérationnel.
-On utilise `mysqladmin ping` pour tester la connexion à la base en boucle.
-Tant que la base de données n'est pas disponible (le conteneur MariaDB démarre souvent plus lentement), le script attend et affiche un message toutes les 2 secondes.
-Cela garantit que WordPress ne tente pas de se connecter trop tôt à MariaDB, ce qui entrainerait une erreur d'installation.
+Before starting the WordPress installation with WP-CLI, we check that the MariaDB service is operational.
+We use `mysqladmin ping` to test the connection to the database in a loop.
+As long as the database is not available (the MariaDB container often starts more slowly), the script waits and displays a message every 2 seconds.
+This ensures that WordPress does not try to connect to MariaDB too early, which would lead to an installation error.
 
 ```bash
     wp config create \
         --dbname="$MDB_NAME" \
         --dbuser="$MDB_USER" \
-        --dbpass="$MDB_USER_PASS" \
+        --dbpass="$MDB_USER_PASS"\
         --dbhost="mariadb" \
         --path=/var/www/wordpress \
         --allow-root
 ```
 
-Utilise `wp-cli` pour générer un fichier `wp-config.php` à partir des variables d’environnement définies dans le `.env`.
-`--allow-root` est requis car `wp-cli` est exécuté avec les droits root dans le conteneur.
-Le fichier est généré dans `/var/www/wordpress`.
+Uses `wp-cli` to generate a `wp-config.php` file from the environment variables defined in the `.env`.
+`--allow-root` is required because `wp-cli` is executed with root rights in the container.
+The file is generated in `/var/www/wordpress`.
 
 ```bash
     wp core install \
@@ -1844,8 +1848,8 @@ Le fichier est généré dans `/var/www/wordpress`.
         --allow-root
 ```
 
-Lance l’installation de WordPress avec les informations du site (URL, titre) et les identifiants de l’administrateur principal.
-L’option `--skip-email` désactive l’envoi d’un mail de confirmation (inutile dans ce contexte).
+Launches the WordPress installation with the site information (URL, title) and the main administrator's credentials.
+The `--skip-email` option disables sending a confirmation email (useless in this context).
 
 ```bash
     wp user create "$WP_USER_LOGIN" "$WP_USER_EMAIL" \
@@ -1854,101 +1858,101 @@ L’option `--skip-email` désactive l’envoi d’un mail de confirmation (inut
         --allow-root
 ```
 
-Crée un second utilisateur WordPress avec le rôle `author`, utile pour les tests ou démontrer l’accès multi-utilisateur.
+Creates a second WordPress user with the `author` role, useful for testing or demonstrating multi-user access.
 
 ```bash
 exec /usr/sbin/php-fpm7.4 -F
 ```
 
-Lance PHP-FPM en mode **foreground** (`-F`) pour que le conteneur reste actif.
-Le `exec` remplace le processus shell actuel par PHP-FPM, comme le recommande Docker.
+Launches PHP-FPM in **foreground** mode (`-F`) so that the container remains active.
+The `exec` replaces the current shell process with PHP-FPM, as recommended by Docker.
 
 ---
 
-## FINALISER LE FICHIER `docker-compose.yml`
+## FINALIZE THE `docker-compose.yml` FILE
 
-Maintenant que nous avons nos trois `Dockerfile`, nous pouvons compléter le `docker-compose.yml` pour intégrer le conteneur `wordpress`.
+Now that we have our three `Dockerfile`s, we can complete the `docker-compose.yml` to integrate the `wordpress` container.
 
-Mais avant cela, nous devons aborder deux nouveaux concepts de `docker compose` :
-- les volumes
-- les `depends_on`
-- les `restart`
+But before that, we need to address two new `docker compose` concepts:
+- volumes
+- `depends_on`
+- `restart`
 
-### VOLUMES : PERSISTANCE DES DONNEES
+### VOLUMES: DATA PERSISTENCE
 
-Dans Docker, un **volume** est un espace de stockage indépendant du cycle de vie des conteneurs.
-Il permet de **conserver des données même si un conteneur est supprimé ou reconstruit**, en les stockant sur la machine hôte.
-Dans le cadre du projet Inception, l'utilisation de volumes est **obligatoire** pour assurer la **persistance des données de MariaDB** (les bases de données) et de **WordPress** (les fichiers, plugins, images uploadées, etc.).
+In Docker, a **volume** is a storage space independent of the container lifecycle.
+It allows **preserving data even if a container is deleted or rebuilt**, by storing it on the host machine.
+In the context of the Inception project, the use of volumes is **mandatory** to ensure the **persistence of MariaDB data** (the databases) and **WordPress** (files, plugins, uploaded images, etc.).
 
-Les volumes sont déclarés dans la section `volumes:` du fichier `docker-compose.yml`.
-Pour respecter les contraintes du sujet, ils doivent utiliser le **type `none`** et être **montés sur des dossiers locaux situés dans `~/data`**, via l’option `device`.
+Volumes are declared in the `volumes:` section of the `docker-compose.yml` file.
+To comply with the subject's constraints, they must use the **`none` type** and be **mounted on local folders located in `~/data`**, via the `device` option.
 
-> Dans Inception, le sujet impose que les volumes ne soient **ni anonymes, ni purement nommés**, mais qu’ils soient **explicitement liés à un répertoire local sur la machine hôte**, situé dans `~/data`.
+> In Inception, the subject requires that volumes be **neither anonymous nor purely named**, but that they be **explicitly linked to a local directory on the host machine**, located in `~/data`.
 >
-> Pour cela, on utilise le **driver `local`** avec l’option `driver_opts` :
+> To do this, we use the **`local` driver** with the `driver_opts` option:
 >
-> - `type: none` indique que le volume **n’utilise aucun système de fichiers spécial** (comme tmpfs ou nfs).
-> - `device: ~/data/<service>` précise **le chemin exact sur le système hôte** à monter dans le conteneur.
-> - `o: bind` signifie qu’il s’agit d’un **montage de type "bind"**, qui relie directement le dossier local au dossier interne du conteneur.
+> - `type: none` indicates that the volume **uses no special file system** (like tmpfs or nfs).
+> - `device: ~/data/<service>` specifies **the exact path on the host system** to mount in the container.
+> - `o: bind` means that it is a **"bind" type mount**, which directly links the local folder to the container's internal folder.
 >
-> Ce mécanisme permet de **visualiser et manipuler les données directement sur la machine**, tout en respectant les exigences du sujet (un dossier par service dans `~/data/`).
+> This mechanism allows **visualizing and manipulating data directly on the machine**, while respecting the subject's requirements (one folder per service in `~/data/`).
 
-Puisque les données vont être sauvegardées en local sur notre machine hôte, il nous faut créer les dossiers nécessaires sur la machine hôte :
+Since the data will be saved locally on our host machine, we need to create the necessary folders on the host machine:
 
 ```bash
-mkdir -p ~/data/worpress ~/data/mariadb
+mkdir -p ~/data/wordpress ~/data/mariadb
 ```
 
-> 📝 **Note importante :**
+> 📝 **Important note:**
 >
-> La commande suivante permet d’arrêter tous les conteneurs lancés avec `docker compose`, et de supprimer les volumes Docker associés :
+> The following command allows stopping all containers launched with `docker compose`, and deleting the associated Docker volumes:
 >
 > ```bash
 > docker compose down -v
 > ```
 >
-> Cependant, dans le cadre du projet **Inception**, les volumes ne sont **pas de vrais volumes Docker**, mais des **dossiers locaux liés par un bind mount** (comme `~/data/mariadb`).
+> However, in the context of the **Inception** project, the volumes are **not real Docker volumes**, but **local folders linked by a bind mount** (like `~/data/mariadb`).
 >
-> ⚠️ Cela signifie que **le contenu de ces dossiers n’est pas supprimé** par la commande `docker compose down -v`.
+> ⚠️ This means that **the content of these folders is not deleted** by the `docker compose down -v` command.
 >
-> Pour réinitialiser complètement l’environnement (bases de données, fichiers WordPress…), il faut aussi **supprimer manuellement** les données locales :
+> To completely reset the environment (databases, WordPress files…), you must also **manually delete** the local data:
 >
 > ```bash
 > sudo rm -rf ~/data/mariadb/* ~/data/wordpress/*
 > ```
 
-### GERER L'ORDRE DE DEMARRAGE AVEC `depends_on`
+### MANAGING STARTUP ORDER WITH `depends_on`
 
-Dans un environnement multi-conteneurs, il est essentiel que certains services soient démarrés **avant** d'autres.
-Par exemple, WordPress doit pouvoir se connecter à MariaDB au lancement.
-La directive `depends_on` permet de définir ces **relations de dépendance** dans le fichier `docker-compose.yml`.
+In a multi-container environment, it is essential that some services be started **before** others.
+For example, WordPress must be able to connect to MariaDB at launch.
+The `depends_on` directive allows defining these **dependency relationships** in the `docker-compose.yml` file.
 
-Lorsqu’un service A dépend d’un service B (`depends_on: - B`), Docker veillera à **lancer B avant A**, mais ne garantit pas que B soit **entièrement prêt** (ex. : que MariaDB accepte déjà les connexions).
-Pour cela, des mécanismes comme les `healthcheck` ou des scripts d’attente dans le `entrypoint.sh` peuvent être utilisés si besoin.
-Dans Inception, `depends_on` et les précautions prises dans les scripts sont suffisants pour assurer un lancement structuré des services.
+When a service A depends on a service B (`depends_on: - B`), Docker will ensure to **launch B before A**, but does not guarantee that B is **fully ready** (e.g., that MariaDB already accepts connections).
+For this, mechanisms like `healthcheck` or waiting scripts in the `entrypoint.sh` can be used if needed.
+In Inception, `depends_on` and the precautions taken in the scripts are sufficient to ensure a structured launch of the services.
 
-### POLITIQUE DE REDEMARRAGE AVEC `restart`
+### RESTART POLICY WITH `restart`
 
-Le sujet de **Inception** nous dit explicitement que les conteneurs doivent redémarre en cas de crash.
-Pour cela nous allons utiliser la directive `restart` et lui donner la valeur `unless-stopped`, ce qui veut dire que le conteneur redémarrera automatiquement s'il s'arrête sauf si nous l'avons arrêté nous-même manuellement (avec `docker stop` par exemple).
+The **Inception** subject explicitly tells us that the containers must restart in case of a crash.
+For this we will use the `restart` directive and give it the value `unless-stopped`, which means that the container will restart automatically if it stops unless we have stopped it ourselves manually (with `docker stop` for example).
 
-> L'option `restart` permet de définir le comportement de redémarrage automatique des conteneurs.
-> Les valeurs possibles sont :
+> The `restart` option allows defining the automatic restart behavior of containers.
+> Possible values are:
 > 
-> * `no` *(ou valeur par défaut)* :
->   Le conteneur ne redémarre pas automatiquement.
-> * `always` :
->   Le conteneur redémarre systématiquement, même s’il a été arrêté manuellement.
-> * `on-failure` :
->   Le conteneur redémarre uniquement en cas d’échec (code de sortie différent de `0`).
-> * `on-failure:N` :
->   Même comportement que `on-failure`, mais limite le nombre de redémarrages à `N`.
-> * `unless-stopped` :
->   Le conteneur redémarre automatiquement **sauf** s’il a été arrêté manuellement.
+> * `no` *(or default value)*:
+>   The container does not restart automatically.
+> * `always`:
+>   The container restarts systematically, even if it has been stopped manually.
+> * `on-failure`:
+>   The container restarts only in case of failure (exit code different from `0`).
+> * `on-failure:N`:
+>   Same behavior as `on-failure`, but limits the number of restarts to `N`.
+> * `unless-stopped`:
+>   The container restarts automatically **unless** it has been stopped manually.
 > 
-> Cette option est ignorée si vous utilisez `docker compose run`, mais elle fonctionne avec `docker compose up`.
+> This option is ignored if you use `docker compose run`, but it works with `docker compose up`.
 
-### LE FICHIER FINAL
+### THE FINAL FILE
 
 ```yaml
 services:
@@ -1998,526 +2002,9 @@ volumes:
     driver_opts:
       type: none
       device: ~/data/mariadb
-      o: bind
-
   wordpress:
     driver: local
     driver_opts:
       type: none
       device: ~/data/wordpress
-      o: bind
-
-networks:
-  inception:
-    driver: bridge
 ```
-
-### EXPLICATIONS
-
-Ce fichier définit les trois services principaux du projet Inception : **MariaDB**, **WordPress** et **Nginx**, ainsi que les volumes et le réseau nécessaires à leur bon fonctionnement.
-
-#### `services:`
-
-Contient la définition des trois conteneurs que Docker Compose va construire et orchestrer.
-
-* `mariadb`
-
-```yaml
-mariadb:
-  build: requirements/mariadb
-  container_name: mariadb
-  env_file: .env
-  restart: unless-stopped
-  volumes:
-    - mariadb:/var/lib/mysql
-  expose:
-    - "3306"
-  networks:
-    - inception
-```
-
-* `build`: indique le chemin vers le `Dockerfile` de MariaDB.
-* `container_name`: nom fixe du conteneur, facilitant les appels réseau (ex: `db_host = mariadb`)
-* `env_file`: charge les variables d’environnement depuis le fichier `.env`
-* `volumes`: monte un volume pour **persister les données MySQL** dans `~/data/mariadb` :
-  Dans le conteneur, les fichiers de base de données sont écrits dans `/var/lib/mysql`.
-  Sur la machine hôte, ces fichiers sont stockés dans le dossier `~/data/mariadb`, comme précisé plus loin dans le bloc `volumes`.
-  Les deux emplacements sont **liés en temps réel** : toute écriture dans `/var/lib/mysql` sera immédiatement visible dans `~/data/mariadb`.
-* `expose`: rend le port 3306 **disponible pour les autres services Docker** (mais pas exposé à l’extérieur).
-* `networks`: rattache le conteneur au réseau interne `inception`.
-
-* `wordpress`
-
-```yaml
-wordpress:
-  build: requirements/wordpress
-  container_name: wordpress
-  env_file: .env
-  restart: unless-stopped
-  depends_on:
-    - mariadb
-  volumes:
-    - wordpress:/var/www/wordpress
-  expose:
-    - "9000"
-  networks:
-    - inception
-```
-
-* `build`: chemin vers le `Dockerfile` WordPress (PHP-FPM).
-* `container_name`: nom fixe du conteneur.
-* `env_file`: charge les variables nécessaires à l’installation (BDD, comptes, etc.).
-* `depends_on`: attend que `mariadb` soit **démarré** (ne garantit pas qu’il soit **prêt**).
-* `volumes`: monte le dossier WordPress, partagé avec Nginx, pour **persister plugins et uploads**.
-* `expose`: rend le port PHP-FPM 9000 disponible pour Nginx.
-* `networks`: rattache le conteneur au réseau `inception`.
-
-* `nginx`
-
-```yaml
-nginx:
-  build: requirements/nginx
-  container_name: nginx
-  env_file: .env
-  depends_on:
-    - wordpress
-  ports:
-    - "443:443"
-  volumes:
-    - wordpress:/var/www/wordpress
-  networks:
-    - inception
-```
-
-* `build`: chemin vers le `Dockerfile` Nginx.
-* `container_name`: nom du conteneur frontal.
-* `env_file`: accessible si tu veux passer des variables à la config Nginx.
-* `depends_on`: s’assure que `wordpress` est lancé **avant** `nginx`.
-* `ports`: redirige le port HTTPS 443 de l’hôte vers le conteneur (accès navigateur).
-  (La syntaxe utilisée est : <port_hôte>:<port_conteneur>)
-* `volumes`: partage le code WordPress pour que Nginx serve les fichiers statiques.
-* `networks`: même réseau que les autres services.
-
-#### `volumes:`
-
-Définit les volumes montés dans chaque conteneur pour **préserver les données** et respecter les règles d’Inception.
-
-```yaml
-volumes:
-  mariadb:
-    driver: local
-    driver_opts:
-      type: none
-      device: ~/data/mariadb
-      o: bind
-
-  wordpress:
-    driver: local
-    driver_opts:
-      type: none
-      device: ~/data/wordpress
-      o: bind
-```
-
-* `type: none`: n'utilise pas de FS spécial (ni tmpfs, ni nfs).
-* `device`: chemin absolu sur la machine hôte (dans `~/data`).
-* `o: bind`: fait un lien direct entre ce dossier et le conteneur.
-* Cela permet de **manipuler les données WordPress et MariaDB même depuis la machine hôte**.
-
-#### `networks:`
-
-Déclare le réseau interne `inception`, utilisé pour que les conteneurs puissent se **communiquer directement** par leur nom.
-
-```yaml
-networks:
-  inception:
-    driver: bridge
-```
-
-* `bridge`: réseau Docker classique, adapté aux communications internes entre services.
-
-### LES COMMANDES COURANTES POUR DOCKER COMPOSE
-
-* `docker compose up`
-  Construit les images (si besoin) et démarre tous les services définis dans le `docker-compose.yml`.
-
-* `docker compose up --build`
-  Force la reconstruction des images avant de démarrer les services.
-
-* `docker compose up -d`
-  Lance les services en **mode détaché** (en arrière-plan).
-
-* `docker compose down`
-  Arrête tous les services et supprime les conteneurs, réseaux et fichiers temporaires.
-  Les **volumes persistants** (comme les données MySQL) ne sont **pas supprimés**.
-
-* `docker compose down -v`
-  Supprime également les **volumes liés aux services**. Attention : les données seront alors perdues.
-
-* `docker compose ps`
-  Affiche l’état des conteneurs gérés par Docker Compose.
-
-* `docker compose stop`
-  Arrête les conteneurs sans les supprimer (peut être relancé avec `start`).
-
-* `docker compose start`
-  Redémarre les conteneurs précédemment arrêtés.
-
-* `docker compose restart`
-  Redémarre tous les services. Utile pour appliquer des modifications de configuration.
-
-* `docker compose logs`
-  Affiche les logs de tous les services.
-
-* `docker compose logs -f`
-  Affiche les logs en temps réel (**follow**).
-
-* `docker compose exec <service> <commande>`
-  Exécute une commande dans un conteneur déjà en cours d’exécution (ex : `bash`, `mysql`, etc.).
-
-* `docker compose rm`
-  Supprime les conteneurs arrêtés manuellement (sans passer par `down`).
-
----
-
-## TESTS
-
-Le projet étant bientôt terminé, il est temps de tester si tout fonctionne correctement.
-Voici comment vérifier que notre environnement Docker Compose fonctionne correctement, que WordPress est opérationnel et que les données sont bien persistantes.
-
-### 1. LANCER `docker compose`
-
-Depuis le répertoire racine du projet, lancez :
-
-```bash
-docker compose -f srcs/docker-compose.yml --env-file srcs/.env up -d
-```
-
-Cela démarre tous les conteneurs (WordPress, MariaDB, etc.) en arrière-plan.
-
-Vous pouvez vérifier qu'ils tournent avec :
-
-```bash
-docker ps
-```
-
-Les trois conteneurs nginx, MariaDB et wordpress doivent apparaître dans la liste.
-
-### 2. OUVRIR WORDPRESS DANS LE NAVIGATEUR
-
-Une fois les conteneurs démarrés, ouvrez votre navigateur et allez sur :
-
-```
-https://localhost
-```
-
-Vous devriez voir la page d’accueil de WordPress avec l’article de bienvenue.
-
-### 3. TESTER LA PERSISTANCE DES DONNEES
-
-#### a. Créer une nouvelle page dans WordPress
-
-1. Connectez-vous à l’interface d’administration (en utilisant l'identifiant et le mot de passe défini pour l'administrateur wordpress dans le fichier `.env`):
-
-   ```
-   https://localhost/wp-admin
-   ```
-
-3. Allez dans **Pages > Ajouter**
-
-4. Créez une page appelée **"Test Persistance"** et publiez-la
-
-#### b. Redémarrer la VM hôte (et pas seulement Docker)
-
-1. Stoppez docker avec la commande suivante (qui stoppe les conteneurs et supprime les images sans supprimez les volumes) :
-   
-   ```bash
-	docker compose stop
-   ```
-   
-3. Éteignez totalement la machine virtuelle (VM)
-4. Redémarrez-la
-5. Relancez les conteneurs :
-
-```bash
-docker compose -f srcs/docker-compose.yml --env-file srcs/.env up -d
-```
-
-Le `-f` sert à spécifier le chemin du fichier `docker-compose.yml`. Il serait inutile si nous nous trouvions dans le répertoire contenant le fichier.
-
-#### c. Vérifier que la page existe toujours
-
-Retournez sur `https://localhost`, puis allez dans **Pages**.
-Vous devriez voir **"Test Persistance"** toujours présente. Si ce n'est pas le cas, c'est qu'il y a un problème avec les volumes.
-
-### 4. Vérifier la présence de la page dans la base de données MariaDB
-
-Vous pouvez accéder directement à la base MariaDB pour voir si la page est bien enregistrée :
-
-#### a. Entrer dans le conteneur MariaDB
-
-```bash
-docker exec -it mariadb bash
-```
-
-#### b. Se connecter à MariaDB
-
-```bash
-mariadb -u<VOTRE_UTILISATEUR> -p<VOTRE_MOT_DE_PASSE>
-```
-
-> Remplacez `<VOTRE_UTILISATEUR>` et <VOTRE_MOT_DE_PASSE> par les valeurs de `MDB_USER` et `MDB_USER_PASS` dans votre `.env`.
-
-#### c. Interroger la base
-
-```sql
-USE inception;
-SELECT ID, post_title FROM wp_posts;
-```
-
-Vous devriez voir la page **"Test Persistance"** dans les résultats.
-
-Si tous ces tests passent, votre installation est fonctionnelle, persistante, et bien connectée entre les services WordPress et MariaDB.
-
----
-
-## MAKEFILE ET DERNIERES TOUCHES
-
-Maintenant que le projet fonctionne, il nous manque quelques détails à finaliser.
-
-### NOM DE DOMAINE
-
-Pour le moment, nous accédons à wordpress dans le navigateur par :
-
-```
-https://localhost
-```
-
-Or le sujet exige que nous puissions aussi y accéder par notre nom de domaine (`<votre_login>.42.fr`).
-Pour que cela fonctionne en local, il faut déclarer ce nom de domaine dans le DNS de la machine, en l’associant à `127.0.0.1` (l’adresse de loopback).
-Il faut donc éditer le fichier `/etc/hosts` et y ajouter la ligne suivante :
-
-```
-127.0.0.1 <votre_login>.42.fr
-```
-
-> Remplacez `<votre_login>` par votre vrai identifiant 42 (ex : `jdupont.42.fr`).
-
-Cette redirection ne fonctionne que sur **votre machine locale**, elle n’est pas publique.
-
-### MAKEFILE
-
-Le sujet n'est pas très explicite au sujet du Makefile. Mais nous pouvons assumer qu'il doit contenir au minimum :
-
-- une règle pour **lancer les conteneurs**
-- une autre pour **les arrêter sans supprimer les volumes**, afin de préserver la persistance des données
-
-#### Makefile minimum
-
-Un Makefile minimum pourrait se contenter de :
-
-```Makefile
-all:
-	docker compose -f srcs/docker-compose.yml --env-file srcs/.env up -d
-
-clean:
-	docker compose -f srcs/docker-compose.yml down --rmi all
-```
-
-> L'option `--rmi all` permet de détruire les images.
-
-#### Makefile complet
-
-Pour ma part, j'ai ajouté quelques règles à mon Makefile afin de :
-
-- Vérifier que le fichier `.env` est bien présent lors de l'éxecution de la commande `make`
-- Vérifier que chacune des  variables d'environnement nécessaires au projet sont bien existantes et non nulles (ce qui me permet au passage de supprimer les vérifications de variables dans les scripts)
-- Vérifier que les dossiers `~/data/wordpress` et `~/data/mariadb` existent (nécessaires pour la persistances des données) ou les créer lors de l'éxécution si ce n'est pas le cas
-- Vérifier que le DOMAIN_NAME soit bien présent dans le fichier `/etc/hosts` ou bien ajouter la ligne nécesaire au fichier si ce n'est pas le cas
-
-Enfin j'ai ajouté les règles :
-
-- `reset` qui stoppe les conteneurs, supprime les images et supprime les volumes docker ainsi que les répertoires `~/data/wordpress` et `~/data/mariadb` sur la machine hôte (entraînant la fin de la persistance des données)
-- `down` qui stoppe les conteneurs sans détruire les images
-
-```bash
-SHELL := /bin/bash
-COMPOSE_PATH := srcs/docker-compose.yml
-ENV_FILE := srcs/.env
-REQUIRED_VARS := MDB_NAME \
-                 MDB_USER \
-                 MDB_ROOT_PASS \
-                 MDB_USER_PASS \
-                 DOMAIN_NAME \
-                 WEBSITE_TITLE \
-                 WP_ADMIN_LOGIN \
-                 WP_ADMIN_EMAIL \
-                 WP_ADMIN_PASS \
-                 WP_USER_LOGIN \
-                 WP_USER_EMAIL \
-                 WP_USER_PASS
-
-all: check_vars setup_dirs setup_hosts up
-
-# Check if .env file exists in srcs/
-check_env:
-	@echo "Checking if $(ENV_FILE) exists..."
-	@if [ ! -f $(ENV_FILE) ]; then \
-		echo "❌ Error: $(ENV_FILE) file not found. Please create it before running make."; \
-		exit 1; \
-	else \
-		echo "✅ $(ENV_FILE) file found."; \
-	fi
-
-check_vars: check_env
-	@echo "Checking required environment variables..."
-	@set -a; . $(ENV_FILE); set +a; \
-	for var in $(REQUIRED_VARS); do \
-		val=$${!var}; \
-		if [ -z "$$val" ]; then \
-			echo "❌ Error: Environment variable '$$var' is not set or empty in $(ENV_FILE)"; \
-			exit 1; \
-		else \
-			echo "✅ $$var"; \
-		fi; \
-	done
-
-# Create ~/data/wordpress and ~/data/mariadb if they don't exist
-setup_dirs:
-	@echo "Checking ~/data/wordpress and ~/data/mariadb directories..."
-	@if [ ! -d "$$HOME/data/wordpress" ]; then \
-		echo "Creating $$HOME/data/wordpress directory"; \
-		mkdir -p "$$HOME/data/wordpress"; \
-	fi
-	@if [ ! -d "$$HOME/data/mariadb" ]; then \
-		echo "Creating $$HOME/data/mariadb directory"; \
-		mkdir -p "$$HOME/data/mariadb"; \
-	fi
-
-# Add 127.0.0.1 DOMAIN_NAME to /etc/hosts if missing
-setup_hosts:
-	@DOMAIN_NAME=$$(grep '^DOMAIN_NAME=' $(ENV_FILE) | cut -d= -f2); \
-	echo "Checking /etc/hosts entry for $$DOMAIN_NAME..."; \
-	if ! grep -q "127.0.0.1 $$DOMAIN_NAME" /etc/hosts; then \
-		echo "Adding '127.0.0.1 $$DOMAIN_NAME' to /etc/hosts (sudo required)"; \
-		echo "127.0.0.1 $$DOMAIN_NAME" | sudo tee -a /etc/hosts > /dev/null; \
-	else \
-		echo "✅ /etc/hosts already contains the entry"; \
-	fi
-
-# Run docker compose up using the config in srcs/
-up:
-	@echo "🐳 Starting docker compose using $(COMPOSE_PATH)..."
-	@docker compose --env-file $(ENV_FILE) -f $(COMPOSE_PATH) up -d
-
-# Stop containers and without removing images or deleting volumes
-down:
-	@echo "🛑 Stopping containers without removing images (data preserved)..."
-	@docker compose -f srcs/docker-compose.yml down
-
-# Stop containers and remove images without deleting volumes
-clean:
-	@echo "🛑 Stopping containers and removing images (data preserved)..."
-	@docker compose -f srcs/docker-compose.yml down --rmi all
-
-# Full reset: stop, remove containers & volumes, delete local data
-reset:
-	@echo "⚠️  WARNING: This will stop containers, remove volumes, and delete local data in ~/data"
-	@read -p "Are you sure you want to continue? [y/N] " confirm; \
-	if [ "$$confirm" != "y" ] && [ "$$confirm" != "Y" ]; then \
-		echo "❌ Reset aborted."; \
-		exit 1; \
-	fi
-	@echo "Proceeding with full reset..."
-	@docker compose -f srcs/docker-compose.yml down -v --rmi all
-	@echo "Deleting local data directories..."
-	sudo rm -rf $$HOME/data/wordpress $$HOME/data/mariadb
-
-re: clean all
-```
-
-### NOMMER CORRECTEMENT LES IMAGES
-
-Le sujet impose que chaque image construite ait un nom explicite, correspondant au service (par exemple `mariadb` pour le service MariaDB).
-Or, si on ne précise rien dans le fichier `docker-compose.yml`, Docker nomme les images automatiquement avec des préfixes et suffixes (par exemple `srcs-mariadb`), ce qui ne respecte pas cette contrainte.
-
-Nous allons donc modifier notre `docker-compose.yml` pour spécifier un nom d’image explicite.
-
-#### Utilisation de la clé `image`
-
-Jusqu’à présent, dans notre `docker-compose.yml`, nous écrivions simplement :
-
-```yaml
-services:
-  mariadb:
-    build: requirements/mariadb
-```
-
-Cela fonctionne, mais ne permet pas de contrôler le nom de l’image construite.
-Pour y remédier, nous allons :
-
-1. Remplacer la valeur directe de `build` par un bloc `build:` avec la clé `context`, pointant sur le répertoire de build.
-2. Ajouter la clé `image:` (en dehors du bloc `build`) pour définir explicitement le nom de l’image.
-
-Exemple :
-
-```yaml
-services:
-  mariadb:
-    build:
-      context: requirements/mariadb
-    image: mariadb
-```
-
-#### Problème avec les noms d’image "officiels"
-
-Si nous utilisons un nom d’image générique comme `mariadb`, `nginx`, ou `wordpress`, Docker va **chercher une image existante sur Docker Hub**, ce qui est interdit par le sujet.
-
-Même si nous avons bien un `Dockerfile` dans `requirements/mariadb`, Docker ignorera la construction et tentera de récupérer l’image officielle.
-
-#### Solution : ajouter un *tag*
-
-Pour éviter cela, il suffit **d’ajouter un tag** au nom de l’image.
-Un tag est un suffixe après un deux-points `:` qui identifie une version personnalisée.
-Cela empêche Docker de confondre votre image avec une image officielle.
-
-Par exemple :
-
-```yaml
-services:
-  mariadb:
-    build:
-      context: requirements/mariadb
-    image: mariadb:inception42
-```
-
-Dès lors, Docker ne trouvera pas d’image `mariadb:inception42` sur Docker Hub, et construira bien la notre à partir du `Dockerfile`.
-
-### DOCKERIGNORE
-
-Lorsque Docker construit une image à partir d’un contexte (`build.context`), **il copie l’ensemble des fichiers du répertoire source** pour les envoyer au démon Docker.
-Cela peut inclure des fichiers inutiles (comme `.env`, des logs, des fichiers temporaires, le dossier `.git`, ou même des secrets), ce qui peut :
-
-* ralentir considérablement le build
-* **poser des risques de sécurité** si des données sensibles sont accidentellement copiées dans l’image
-
-Pour éviter cela, il est indispensable de créer un fichier `.dockerignore` dans **chaque dossier contenant un `Dockerfile`** (typiquement : `requirements/nginx/`, `requirements/mariadb/`, `requirements/wordpress/`).
-
-Ce fichier fonctionne exactement comme un `.gitignore` : chaque ligne indique un chemin ou un motif à ignorer.
-
-Pour ma part, jai créé le même `.dockerignore` pour chacune des images :
-
-```
-.git         # Ne pas envoyer l’historique Git
-.gitignore   # Fichier inutile pour le build
-.vscode      # Dossier de configuration de l’éditeur (Visual Studio Code)
-*.swp        # Fichiers temporaires de Vim
-*.log        # Fichiers de logs
-*.tmp        # Fichiers temporaires divers
-*.bak        # Sauvegardes automatiques
-.env         # Fichier contenant les variables d’environnement sensibles
-secrets/     # Répertoire contenant les mots de passe ou informations critiques
-```
-
-> Important : même si nous copions manuellement certains fichiers via `COPY` dans notre `Dockerfile`, ils **doivent quand même être accessibles dans le contexte**.
-> Un fichier ignoré dans `.dockerignore` **ne pourra pas être copié**, sauf s’il est explicitement **hors du dossier ignoré**.
