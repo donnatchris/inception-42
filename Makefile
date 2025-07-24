@@ -87,6 +87,7 @@ reset:
 	fi
 	@echo "Proceeding with full reset..."
 	@docker compose -f srcs/docker-compose.yml down -v --rmi all
+	@docker system prune -a -f
 	@echo "Deleting local data directories..."
 	sudo rm -rf /home/chdonnat/data/wordpress /home/chdonnat/data/mariadb
 

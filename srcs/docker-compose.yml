@@ -52,6 +52,19 @@ services:
       - "80"
     networks:
       - inception
+  
+  adminer:
+    build:
+      context: requirements/bonus/adminer
+    image: adminer:chdonnat42
+    container_name: adminer
+    env_file: .env
+    depends_on:
+      - mariadb
+    expose:
+      - "80"
+    networks:
+      - inception
 
 volumes:
   mariadb:
