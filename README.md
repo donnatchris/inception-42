@@ -1817,7 +1817,7 @@ Maintenant que nous avons nos trois `Dockerfile`, nous pouvons compléter le `do
 Mais avant cela, nous devons aborder deux nouveaux concepts de `docker compose` :
 - les volumes
 - les `depends_on`
-- les `healthcheck`
+- les `restart`
 
 ### VOLUMES : PERSISTANCE DES DONNEES
 
@@ -1870,7 +1870,28 @@ La directive `depends_on` permet de définir ces **relations de dépendance** da
 
 Lorsqu’un service A dépend d’un service B (`depends_on: - B`), Docker veillera à **lancer B avant A**, mais ne garantit pas que B soit **entièrement prêt** (ex. : que MariaDB accepte déjà les connexions).
 Pour cela, des mécanismes comme les `healthcheck` ou des scripts d’attente dans le `entrypoint.sh` peuvent être utilisés si besoin.
-Dans Inception, `depends_on` est suffisant pour assurer un lancement structuré des services.
+Dans Inception, `depends_on` et les précautions prises dans les scripts sont suffisants pour assurer un lancement structuré des services.
+
+### POLITIQUE DE REDEMARRAGE AVEC `restart`
+
+Le sujet de **Inception** nous dit explicitement que les conteneurs doivent redémarre en cas de crash.
+Pour cela nous allons utiliser la directive `restart` et lui donner la valeur `unless-stopped`, ce qui veut dire que le conteneur redémarrera automatiquement s'il s'arrête sauf si nous l'avons arrêté nous-même manuellement (avec `docker stop` par exemple).
+
+> L'option `restart` permet de définir le comportement de redémarrage automatique des conteneurs.
+> Les valeurs possibles sont :
+> 
+> * `no` *(ou valeur par défaut)* :
+>   Le conteneur ne redémarre pas automatiquement.
+> * `always` :
+>   Le conteneur redémarre systématiquement, même s’il a été arrêté manuellement.
+> * `on-failure` :
+>   Le conteneur redémarre uniquement en cas d’échec (code de sortie différent de `0`).
+> * `on-failure:N` :
+>   Même comportement que `on-failure`, mais limite le nombre de redémarrages à `N`.
+> * `unless-stopped` :
+>   Le conteneur redémarre automatiquement **sauf** s’il a été arrêté manuellement.
+> 
+> Cette option est ignorée si vous utilisez `docker compose run`, mais elle fonctionne avec `docker compose up`.
 
 ### LE FICHIER FINAL
 
@@ -1880,6 +1901,7 @@ services:
     build: requirements/mariadb
     container_name: mariadb
     env_file: .env
+    restart: unless-stopped
     volumes:
       - mariadb:/var/lib/mysql
     expose:
@@ -1891,6 +1913,7 @@ services:
     build: requirements/wordpress
     container_name: wordpress
     env_file: .env
+    restart: unless-stopped
     depends_on:
       - mariadb
     volumes:
@@ -1904,6 +1927,7 @@ services:
     build: requirements/nginx
     container_name: nginx
     env_file: .env
+    restart: unless-stopped
     depends_on:
       - wordpress
     ports:
@@ -1948,6 +1972,7 @@ mariadb:
   build: requirements/mariadb
   container_name: mariadb
   env_file: .env
+  restart: unless-stopped
   volumes:
     - mariadb:/var/lib/mysql
   expose:
@@ -1973,6 +1998,7 @@ wordpress:
   build: requirements/wordpress
   container_name: wordpress
   env_file: .env
+  restart: unless-stopped
   depends_on:
     - mariadb
   volumes:
