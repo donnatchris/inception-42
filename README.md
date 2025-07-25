@@ -1,7 +1,7 @@
+##### [🇫🇷 Version française](README.fr.md) / [🇬🇧 English version](README.md)
+
 # PROJECT INCEPTION FOR 42
 By chdonnat (Christophe Donnat, from 42 Perpignan, France)
-
-[🇫🇷 voir la version française](README.fr.md)
 
 ![Aperçu du site statique](images/static-site.png)
 
