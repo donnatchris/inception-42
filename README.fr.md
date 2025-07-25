@@ -15,7 +15,7 @@ Cela permet d'apprendre la conteneurisation, le réseau, les volumes et la gesti
 J'ai ajouté deux fonctionnalités bonus à ce projet :
 
 * **Adminer** : une interface graphique pour gérer les bases de données.
-* **Site statique** : j'ai converti le coffre Obsidian que j'avais créé en apprenant le C++ en un site statique complet grâce à Quartz.
+* **Site statique** : j'ai converti le vault Obsidian que j'avais créé en apprenant le C++ en un site statique complet grâce à Quartz.
 
 ## QUELQUES COMMANDES UTILES :
 
