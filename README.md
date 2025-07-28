@@ -389,10 +389,6 @@ Here are the most common commands:
   * `-a` (or `--all`) removes all unused images, even those that are not "dangling" (untagged). Without `-a`, only "dangling" images are removed.
   * `-f` forces deletion without asking for confirmation.
 
-
-Perfect, here is an **explanation written for your README**, in your style, which explains **step by step the logic** that led to the writing of this `Dockerfile`. We keep the pedagogical and progressive tone, with references to concepts seen previously.
-
-
 ### BUILDING THE NGINX DOCKERFILE
 
 Now that we have seen the main directives of a `Dockerfile`, we can understand step by step the construction of the Nginx image for the Inception project.
