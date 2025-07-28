@@ -400,10 +400,6 @@ Voici les commandes les plus courantes :
   * `-a` (ou `--all`) supprime toutes les images non utilisées, même celles qui ne sont pas "dangling" (non taguées). Sans `-a`, seules les images "dangling" sont supprimées.
   * `-f` force la suppression sans demander confirmation.
 
-
-Parfait, voici une **explication rédigée pour ton README**, dans ton style, qui explique **pas à pas la logique** ayant conduit à l’écriture de ce `Dockerfile`. On garde le ton pédagogique et progressif, avec des retours aux concepts vus précédemment.
-
-
 ### CONSTRUCTION DU DOCKERFILE NGINX
 
 Maintenant que l’on a vu les principales directives d’un `Dockerfile`, on peut comprendre étape par étape la construction de l’image Nginx pour le projet Inception.
